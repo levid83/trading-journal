@@ -28,7 +28,7 @@ class CsvController extends Controller
                                 'financial_instrument' => isset($row['fin_instrument'])?$row['fin_instrument']:'',
                                 'symbol' => isset($row['symbol'])?$row['symbol']:'',
                                 'price' => isset($row['price'])?$row['price']:'',
-                                'time' => isset($row['time'])?$row['time']:'',
+                                'time' => isset($row['date'])?substr($row['date'],0,4).'-'.substr($row['date'],4,2).'-'.substr($row['date'],6,2).' '.(isset($row['time'])?$row['time']:'00:00:00'):'0000-00-00 00:00:00',
                                 'exchange' => isset($row['exch.'])?$row['exch.']:'',
                                 'vwap_time' => isset($row['vwap_time'])?$row['vwap_time']:'',
                                 'comment' => isset($row['comment'])?$row['comment']:'',
