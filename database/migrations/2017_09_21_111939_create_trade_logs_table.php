@@ -35,7 +35,7 @@ class CreateTradeLogsTable extends Migration
             $table->dateTime('time')->nullable();
             $table->string('exchange')->nullable();
             $table->dateTime('vwap_time')->nullable();
-            $table->text('comment');
+            $table->text('comment')->nullable();
             $table->string('submitter')->nullable();
             $table->string('order_ref')->nullable();
             $table->string('transaction_id')->nullable();
