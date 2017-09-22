@@ -4,18 +4,9 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CreateTradingAccountsTable extends Migration
 {
-
-    use SoftDeletes;
-
-    protected $dates = ['deleted_at'];
-
-    protected $fillable = [
-        'account_id','account_name','account_type'
-    ];
 
     /**
      * Run the migrations.
