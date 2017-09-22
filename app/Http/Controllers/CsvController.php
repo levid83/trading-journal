@@ -5,13 +5,31 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Excel;
 use DB;
+use Storage;
 
 class CsvController extends Controller
 {
+
+    private function handleImport(){
+
+    }
+
+
     public function index(){
-        $data=Excel::load(realpath('uploads/csv/test.csv'), function($reader){})->get();
+
+
+        $files=Storage::disk('local')->files('/csv/');
+        foreach ($files as $file)
+        {
+            echo (string)$file, "\n";
+        }
+        die();
+
+        $data=Excel::load(storage_path('app/csv/test.csv'), function($reader){})->get();
         if (!empty($data)){
             foreach ($data as $key => $row) {
+
+
 
                 $insert[] = [   'drill_down' => isset($row['drill_down'])?$row['drill_down']:'',
                                 'underlying' => isset($row['underlying'])?$row['underlying']:'',
