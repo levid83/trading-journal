@@ -20,4 +20,8 @@ class TradingAccount extends Model
     public function tradeLogs(){
         return $this->hasMany('App\TradeLog');
     }
+
+    public function tradeLogFiles(){
+        return $this->hasMany('App\TradeLogFile');
+    }
 }
