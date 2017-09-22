@@ -23,6 +23,7 @@ class CreateTradingAccountsTable extends Migration
             $table->char('account_name',50);
             $table->enum('account_type',['trader','client']);
 
+            $table->softDeletes();
             $table->timestamps();
         });
     }
