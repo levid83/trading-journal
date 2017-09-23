@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\TradeLog;
 use Illuminate\Http\Request;
 use Excel;
 use DB;
@@ -15,7 +16,7 @@ class CsvController extends Controller
     private function saveTradeList($account_id=0,$trade_log_file_id=0,$data=array()){
         if (!empty($data)) {
             foreach ($data as $key => $row) {
-                $insert[] = [
+                $record = [
                     'trading_account_id' => $account_id,
                     'trade_log_file_id' =>$trade_log_file_id,
                     'drill_down' => isset($row['drill_down']) ? $row['drill_down'] : '',
@@ -69,21 +70,39 @@ class CsvController extends Controller
                     'solicited_by_ibroker' => isset($row['solicited_by_ibroker']) ? $row['solicited_by_ibroker'] : '',
 
                 ];
+
+                $duplication=TradeLog::where('transaction_id',$row['id'])->get();
+                if($duplication->count()>0){
+                    DB::table('trade_logs')->where('transaction_id',$row['id'])->update($record);
+                }else{
+                    $new_values[]=$record;
+                }
             }
-            if (!empty($insert)) {
-                DB::table('trade_logs')->insert($insert);
+            if (!empty($new_values)) {
+                DB::table('trade_logs')->insert($new_values);
             }
         }
     }
 
-    private function saveFileMeta($account_id=0,$file,$last_modified){
-        $tradeLogFile=TradeLogFile::create([
-            'trading_account_id' => $account_id,
-            'file_name' => $file,
-            'last_modification' => $last_modified
-        ]);
+    private function saveImportFileMeta($account_id=0,$file,$last_modified){
 
-        return $tradeLogFile->id;
+        $tradeLogFile=TradeLogFile::where('trading_account_id',$account_id)
+            ->where('file_name',$file)->get();
+
+        if ($tradeLogFile->count()>0){
+            $file_id=$tradeLogFile->first()->id;
+               TradeLogFile::where('trading_account_id',$account_id)
+                ->where('file_name',$file)->update(['last_modification'=>$last_modified]);
+         }else {
+            $tradeLogFile = TradeLogFile::create([
+                'trading_account_id' => $account_id,
+                'file_name' => $file,
+                'last_modification' => $last_modified
+            ]);
+
+            $file_id=$tradeLogFile->id;
+        }
+        return $file_id;
     }
 
     private function handleImport(){
@@ -102,7 +121,7 @@ class CsvController extends Controller
                             if ($db_file->count() == 0) {
                                 $data = Excel::load(storage_path('app/' . $file), function ($reader) {
                                 })->get();
-                                $trade_log_file_id=$this->saveFileMeta($account->id, $file,$last_modified);
+                                $trade_log_file_id=$this->saveImportFileMeta($account->id, $file,$last_modified);
                                 $this->saveTradeList($account->id, $trade_log_file_id, $data);
 
                             }
