@@ -169,7 +169,6 @@ return [
         Laravel\Tinker\TinkerServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
-
         /*
          * Application Service Providers...
          */
