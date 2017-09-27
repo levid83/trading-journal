@@ -33,7 +33,7 @@ class CreateTradesTable extends Migration {
 			$table->decimal('commission_open', 10)->nullable();
 			$table->decimal('commission_close', 10)->nullable();
 			$table->decimal('profit', 10, 4)->nullable();
-			$table->text('description')->nullable();
+			$table->text('description', 65535)->nullable();
 			$table->dateTime('open_date')->nullable();
 			$table->dateTime('close_date')->nullable();
 			$table->string('exchange', 191)->nullable();
