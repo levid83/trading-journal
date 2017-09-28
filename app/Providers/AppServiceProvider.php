@@ -24,6 +24,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        if ($this->app->environment() !== 'production') {
+            //migration generator
+            $this->app->register(\Way\Generators\GeneratorsServiceProvider::class);
+            $this->app->register(\Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
+            //model generator
+            $this->app->register(\Krlove\EloquentModelGenerator\Provider\GeneratorServiceProvider::class);
+        }
     }
 }
