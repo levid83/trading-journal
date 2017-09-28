@@ -169,6 +169,8 @@ return [
         Laravel\Tinker\TinkerServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
+        TCG\Voyager\VoyagerServiceProvider::class,
+
         /*
          * Application Service Providers...
          */
