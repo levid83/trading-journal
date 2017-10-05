@@ -5291,16 +5291,16 @@
         },
         {
             "name": "xethron/migrations-generator",
-            "version": "v2.0.1",
+            "version": "v2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Xethron/migrations-generator.git",
-                "reference": "8a9e187e6d851c59dbd8997a2ac63f0d25d2fe81"
+                "reference": "a05bd7319ed808fcc3125212e37d30ccbe0d2b8b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Xethron/migrations-generator/zipball/8a9e187e6d851c59dbd8997a2ac63f0d25d2fe81",
-                "reference": "8a9e187e6d851c59dbd8997a2ac63f0d25d2fe81",
+                "url": "https://api.github.com/repos/Xethron/migrations-generator/zipball/a05bd7319ed808fcc3125212e37d30ccbe0d2b8b",
+                "reference": "a05bd7319ed808fcc3125212e37d30ccbe0d2b8b",
                 "shasum": ""
             },
             "require": {
@@ -5316,6 +5316,14 @@
                 "phpunit/phpunit": ">=4.0.0"
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Way\\Generators\\GeneratorsServiceProvider",
+                        "Xethron\\MigrationsGenerator\\MigrationsGeneratorServiceProvider"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Xethron\\MigrationsGenerator": "src/"
@@ -5339,7 +5347,7 @@
                 "migration",
                 "migrations"
             ],
-            "time": "2017-02-15T21:39:05+00:00"
+            "time": "2017-09-19T17:31:57+00:00"
         }
     ],
     "aliases": [],
