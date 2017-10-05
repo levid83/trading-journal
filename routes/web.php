@@ -15,12 +15,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/csv', 'CsvController@index')->name('csv.index');
+Route::get('/import/csv/automated-import', 'CsvController@automatedImport')->name('csv.automated-import');
 
-//Auth::routes();
+Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::group(['prefix' => 'admin'], function () {
+Route::group(['prefix' => 'admin', 'middleware'=>['auth']], function () {
+
     Voyager::routes();
+
+    Route::get('/import/csv/bulk-import/create', 'CsvController@create')->name('import.csv.bulk-import.create');
+    Route::post('/import/csv/bulk-import/store', 'CsvController@store')->name('import.csv.bulk-import.store');
 });

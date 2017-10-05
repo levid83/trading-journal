@@ -24,6 +24,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->call('App\Http\Controllers\CsvController@automatedImport')
+            ->everyMinute()
+            ->sendOutputTo(public_path().'/tasks/log.txt');
+
         // $schedule->command('inspire')
         //          ->hourly();
     }
