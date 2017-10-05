@@ -11,7 +11,7 @@ use Session;
 use File;
 use App\TradingAccount;
 use App\TradeLogFile;
-
+use App\Asset;
 class CsvController extends Controller
 {
 
@@ -99,8 +99,16 @@ class CsvController extends Controller
                             //new fields
                         ];
 
-                        //@todo needs conversion  price * multiplier -> ask/bid/contract
-                        $record['price'] = isset($row['price']) ? $row['price'] : '';
+                        if (in_array($row['security_type'], ['FOP','FUT'])) {
+                            $asset = Asset::where('symbol', $row['underlying'])->get();
+                            if ($asset) {
+                                $record['price'] = isset($row['price']) ? $row['price'] * $asset->multiplier : '';
+                            }else{
+                                $record['price'] = isset($row['price']) ? $row['price']:'';
+                            }
+                        } else {
+                            $record['price'] = isset($row['price']) ? $row['price'] * 100 : ''; // default
+                        }
 
                         $record['time'] = isset($row['date']) ? substr($row['date'], 0, 4) . '-' . substr($row['date'], 4, 2) . '-'
                             . substr($row['date'], 6, 2) . ' ' . (isset($row['time']) ? $row['time'] : '00:00:00') : '0000-00-00 00:00:00';
@@ -109,7 +117,7 @@ class CsvController extends Controller
                 if (!empty($record)) {
                     $duplication = TradeLog::where('execution_id', $row['id'])->get();
                     if ($duplication->count() > 0) {
-                        if (!isset($row['clientaccountid'])) { //don't replace the automated import values with bulk values
+                        if (!isset($row['clientaccountid'])) { //don't replace the automated import values by bulk values
                             DB::table('trade_logs')->where('execution_id', $row['id'])->update($record);
                         }
                     } else {
