@@ -19,6 +19,7 @@ class CreateAssetsTable extends Migration {
 			$table->string('name', 50);
 			$table->string('symbol', 10);
 			$table->decimal('multiplier', 10, 0)->nullable()->default(1);
+            $table->decimal('price_correction', 10, 0)->nullable()->default(1);
 			$table->timestamps();
 		});
 	}

@@ -14,9 +14,9 @@ class AssetsTableSeeder extends Seeder
     {
         Asset::create([
             'name'=>'Euro Futures',
-            'symbol'=>'6E',
+            'symbol'=>'EUR',
             'type'=>'futures',
-            'multiplier'=>'1250'
+            'multiplier'=>'1250',
         ]);
         Asset::create([
             'name'=>'Crude Oil Futures',
@@ -53,19 +53,22 @@ class AssetsTableSeeder extends Seeder
             'name'=>'Corn Futures',
             'symbol'=>'ZC',
             'type'=>'futures',
-            'multiplier'=>'5000'
+            'multiplier'=>'50',
+            'price_correction'=>'100'
         ]);
         Asset::create([
             'name'=>'Soybean Futures',
             'symbol'=>'ZS',
             'type'=>'futures',
-            'multiplier'=>'5000'
+            'multiplier'=>'50',
+            'price_correction'=>'100'
         ]);
         Asset::create([
             'name'=>'Wheat Futures',
             'symbol'=>'ZW',
             'type'=>'futures',
-            'multiplier'=>'5000'
+            'multiplier'=>'50',
+            'price_correction'=>'100'
         ]);
     }
 }

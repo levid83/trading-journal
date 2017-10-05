@@ -12,6 +12,7 @@ use File;
 use App\TradingAccount;
 use App\TradeLogFile;
 use App\Asset;
+use App\Events\TradesImported;
 class CsvController extends Controller
 {
 
@@ -64,6 +65,15 @@ class CsvController extends Controller
 
                             $record['time'] = isset($row['tradedate']) && isset($row['tradetime']) ? $row['tradedate'].' '.$row['tradetime']:'';
 
+                            if (in_array($row['security_type'], ['FOP'])) {
+                                $asset = Asset::where('symbol', $row['underlying'])->first();
+                                if ($asset) {
+                                    if ($asset->price_correction!=1){
+                                        $record['strike'] = isset($row['strike']) ? $row['strike']*$asset->price_correction:'';
+                                    }
+                                }
+                            }
+
                         }else{
                             continue; //skip the inner headers
                         }
@@ -88,7 +98,7 @@ class CsvController extends Controller
                             'comment' => isset($row['comment']) ? $row['comment'] : '',/* Empty */
                             'submitter' => isset($row['submitter']) ? $row['submitter'] : '',/* Empty */
                             'commission' => isset($row['commission']) ? $row['commission'] : '',/* IBCommission */
-                            'realized_pl' => isset($row['realized_pl']) ? $row['realized_pl'] : '',/* Empty */
+                            'realized_pl' => isset($row['realized_pl']) ? $row['realized_pl'] : '0.00',/* Empty */
                             'order_id' => isset($row['order_id']) ? $row['order_id'] : '',/* IBOrderID */
                             'exch_exec_id' => isset($row['exch._exec._id']) ? $row['exch._exec._id'] : '',/* ExtExecID */
                             'exch_order_id' => isset($row['exch._order_id']) ? $row['exch._order_id'] : '',/* ExchOrderID */
@@ -100,9 +110,22 @@ class CsvController extends Controller
                         ];
 
                         if (in_array($row['security_type'], ['FOP','FUT'])) {
-                            $asset = Asset::where('symbol', $row['underlying'])->get();
+                            $asset = Asset::where('symbol', $row['underlying'])->first();
                             if ($asset) {
-                                $record['price'] = isset($row['price']) ? $row['price'] * $asset->multiplier : '';
+                                if ($pos_slash=strpos($row['price'],'/')){
+                                         if ($pos_space=strpos($row['price'],' ')){
+                                             echo $row['id'].' '.$row['underlying'].'f'.substr($row['price'],0,$pos_space).'s'.substr($row['price'],$pos_space+1,$pos_slash-$pos_space-1).'t'.substr($row['price'],$pos_slash+1).'<br>';
+                                             $row['price']=intval(substr($row['price'],0,$pos_space))
+                                                 +intval(substr($row['price'],$pos_space+1,$pos_slash-$pos_space-1))/intval(substr($row['price'],$pos_slash+1));
+                                         }else{
+                                             echo $row['id'].' '.$row['underlying'].'f'.substr($row['price'],0,$pos_slash).'s'.substr($row['price'],$pos_slash+1).'<br>';
+                                             $row['price']=intval(substr($row['price'],0,$pos_slash))/intval(substr($row['price'],$pos_slash+1));
+                                         }
+                                }
+                                if ($asset->price_correction!=1){
+                                    $record['strike'] = isset($row['strike']) ? $row['strike']*$asset->price_correction:'';
+                                }
+                                $record['price'] = isset($row['price']) ? $row['price']* $asset->multiplier:'';
                             }else{
                                 $record['price'] = isset($row['price']) ? $row['price']:'';
                             }
@@ -208,6 +231,7 @@ class CsvController extends Controller
 
     public function automatedImport(){
         $this->handleAutomatedImport();
+        event(new TradesImported());
     }
 
     /**
@@ -255,6 +279,8 @@ class CsvController extends Controller
         Storage::disk('local')->put($file_path,  File::get($file));
 
         $this->handleBulkImport($file_path,$account_name);
+
+        event(new TradesImported());
 
         if (!Session::has('error')){
             Session::flash('success', 'Csv ' . $file->getClientOriginalName() . ' imported and processed succesfully.');
