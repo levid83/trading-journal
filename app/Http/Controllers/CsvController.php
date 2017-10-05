@@ -19,7 +19,7 @@ class CsvController extends Controller
 
         if (!empty($data)) {
             foreach ($data as $key => $row) {
-
+                $record=array();
                 if (isset($row['comb.']) && $row['comb.']!=''){
                     //logic to pull out tactic info
                 }else {
@@ -106,13 +106,15 @@ class CsvController extends Controller
                             . substr($row['date'], 6, 2) . ' ' . (isset($row['time']) ? $row['time'] : '00:00:00') : '0000-00-00 00:00:00';
                     }
                 }
-                $duplication=TradeLog::where('execution_id',$row['id'])->get();
-                if($duplication->count()>0 ){
-                    if (!isset($row['clientaccountid'])) { //don't replace the automated import values with bulk values
-                        DB::table('trade_logs')->where('execution_id', $row['id'])->update($record);
+                if (!empty($record)) {
+                    $duplication = TradeLog::where('execution_id', $row['id'])->get();
+                    if ($duplication->count() > 0) {
+                        if (!isset($row['clientaccountid'])) { //don't replace the automated import values with bulk values
+                            DB::table('trade_logs')->where('execution_id', $row['id'])->update($record);
+                        }
+                    } else {
+                        $new_values[] = $record;
                     }
-                }else{
-                    $new_values[]=$record;
                 }
             }
             if (!empty($new_values)) {
@@ -144,11 +146,11 @@ class CsvController extends Controller
 
     private function handleAutomatedImport(){
 
-        $directories = Storage::directories('/csv/');
+        $directories = Storage::directories('/csv/automated/');
         if (!empty($directories)){
             foreach($directories as $directory) {
                 $files = Storage::disk('local')->files($directory);
-                $account = TradingAccount::where('account_id', str_replace_first('csv/', '', $directory))->first();
+                $account = TradingAccount::where('account_id', str_replace_first('csv/automated/', '', $directory))->first();
                 if ($account->id > 0) { //if trading account exists
                     if (!empty($files)) {
                         foreach ($files as $file) {
