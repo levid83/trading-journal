@@ -114,11 +114,9 @@ class CsvController extends Controller
                             if ($asset) {
                                 if ($pos_slash=strpos($row['price'],'/')){
                                          if ($pos_space=strpos($row['price'],' ')){
-                                             echo $row['id'].' '.$row['underlying'].'f'.substr($row['price'],0,$pos_space).'s'.substr($row['price'],$pos_space+1,$pos_slash-$pos_space-1).'t'.substr($row['price'],$pos_slash+1).'<br>';
                                              $row['price']=intval(substr($row['price'],0,$pos_space))
                                                  +intval(substr($row['price'],$pos_space+1,$pos_slash-$pos_space-1))/intval(substr($row['price'],$pos_slash+1));
                                          }else{
-                                             echo $row['id'].' '.$row['underlying'].'f'.substr($row['price'],0,$pos_slash).'s'.substr($row['price'],$pos_slash+1).'<br>';
                                              $row['price']=intval(substr($row['price'],0,$pos_slash))/intval(substr($row['price'],$pos_slash+1));
                                          }
                                 }
