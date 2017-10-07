@@ -1,27 +1,27 @@
 <?php
 
-namespace App;
+namespace App\My\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
+ * @property int $counter
  * @property string $name
- * @property string $description
  * @property Trade[] $trades
  */
-class Tactic extends Model
+class Position extends Model
 {
     /**
      * @var array
      */
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['counter', 'name'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function trades()
     {
-        return $this->hasMany('App\Trade');
+        return $this->hasMany('App\My\Models\Trade');
     }
 }

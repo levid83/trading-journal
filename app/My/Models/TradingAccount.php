@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\My\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -29,7 +29,7 @@ class TradingAccount extends Model
      */
     public function tradeLogFiles()
     {
-        return $this->hasMany('App\TradeLogFile');
+        return $this->hasMany('App\My\Models\TradeLogFile');
     }
 
     /**
@@ -37,7 +37,7 @@ class TradingAccount extends Model
      */
     public function tradeLogs()
     {
-        return $this->hasMany('App\TradeLog');
+        return $this->hasMany('App\My\Models\TradeLog');
     }
 
     /**
@@ -45,7 +45,7 @@ class TradingAccount extends Model
      */
     public function clientTrades()
     {
-        return $this->hasMany('App\Trade', 'client_id');
+        return $this->hasMany('App\My\Models\Trade', 'client_id');
     }
 
     /**
@@ -53,6 +53,6 @@ class TradingAccount extends Model
      */
     public function traderTrades()
     {
-        return $this->hasMany('App\Trade', 'trader_id');
+        return $this->hasMany('App\My\Models\Trade', 'trader_id');
     }
 }
