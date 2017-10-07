@@ -256,7 +256,7 @@ class IBTradeLogFile implements TradeLogProvider
             } elseif ($this->getMethod() == self::AUTOMATED) {
                 return new IBTWSTradeExportMap();
             } else {
-                throw new TradeImportException("Import format " . $format . " doesn't exist! ");
+                throw new TradeImportException("Import method ".$this->getMethod()." doesn't exist! ");
             }
         }
         return false;
