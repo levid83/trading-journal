@@ -22,11 +22,19 @@ class TradeImport
     const BROKER_DIRECTORIES=[1=>'InteractiveBrokers/',2=>'Ameritrade/'];
 
     private $tradeLogProvider=null;
-
+	
+	/**
+	 * TradeImport constructor.
+	 *
+	 * @param TradeLogProvider $tradeLogProvider
+	 */
     public function __construct(TradeLogProvider $tradeLogProvider){
         $this->tradeLogProvider=$tradeLogProvider;
     }
 
+    /**
+     * @param array $data
+     */
     private function saveTradeLogs($data=[]){
         if (!empty($data)) {
             $new_values=[];
@@ -40,7 +48,10 @@ class TradeImport
             }
         }
     }
-
+	
+	/**
+	 *
+	 */
     public function importTradeLogs(){
         DB::beginTransaction();
         $this->tradeLogProvider->buildTradeLogs();

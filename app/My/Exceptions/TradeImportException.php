@@ -8,6 +8,11 @@ use Exception;
  * Date: 2017-10-06
  * Time: 8:27 AM
  */
+
+/**
+ * Class TradeImportException
+ * @package App\My\Exceptions
+ */
 class TradeImportException extends Exception{
 
 }

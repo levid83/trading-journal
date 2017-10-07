@@ -10,8 +10,6 @@ namespace App\My\Classes;
 
 use Excel;
 use DB;
-use GuzzleHttp\Psr7\UploadedFile;
-use Mockery\Exception;
 use Storage;
 use File;
 
@@ -22,6 +20,10 @@ use App\My\Contracts\TradeLogProvider;
 use App\My\Exceptions\TradeImportException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
+/**
+ * Class IBTradeLogFile
+ * @package App\My\Classes
+ */
 class IBTradeLogFile implements TradeLogProvider
 {
     const MANUAL=1;
@@ -36,17 +38,34 @@ class IBTradeLogFile implements TradeLogProvider
     private $file=null;
 
     private $tradeLogs=[];
-
+	
+	/**
+	 * IBTradeLogFile constructor.
+	 *
+	 * @param      $broker
+	 * @param      $method
+	 * @param null $file
+	 */
     public function __construct($broker,$method,$file=null){
         $this->broker=$broker;
         $this->method=$method;
         $this->file=$file;
     }
-
+	
+	/**
+	 *
+	 */
     private function uploadFile(){
         Storage::disk('local')->put($this->getFilePath(),  File::get($this->file));
     }
-
+	
+	/**
+	 * @param int $account_id
+	 * @param     $file
+	 * @param     $last_modified
+	 *
+	 * @return mixed
+	 */
     private function saveImportFileMeta($account_id=0,$file,$last_modified){
 
         $tradeLogFile=TradeLogFile::where('trading_account_id',$account_id)->where('file_name',$file)->get();
@@ -66,7 +85,12 @@ class IBTradeLogFile implements TradeLogProvider
         }
         return $file_id;
     }
-
+	
+	/**
+	 * @param array $params
+	 *
+	 * @return bool
+	 */
     private function mapTradeLog($params=[]){
         if (isset($params['data']) && !empty($params['data'])){
             $this->mapper->setData($params['data'])
@@ -80,46 +104,86 @@ class IBTradeLogFile implements TradeLogProvider
             return false;
         }
     }
-
+	
+	/**
+	 * @return mixed
+	 */
     public function getBroker(){
         return $this->broker;
     }
-
+	
+	/**
+	 * @return mixed
+	 */
     public function getMethod(){
         return $this->method;
     }
-
+	
+	/**
+	 * @return null
+	 */
     public function getFile(){
         return $this->file;
     }
-
+	
+	/**
+	 * @return array
+	 */
     public function getTradeLogs(){
         return $this->tradeLogs;
     }
-
-    public function getAccountId($directory=''){
+	
+	/**
+	 * @param string $directory
+	 *
+	 * @return bool|string
+	 */
+    private function getAccountId($directory=''){
         if($this->getMethod()==self::MANUAL) {
             return substr($this->file->getClientOriginalName(), 0, strpos($this->file->getClientOriginalName(), '_'));
         }else{
-            return str_replace_first('csv/automated/', '', $directory);
+            return str_replace_first('csv/automated/'.TradeImport::BROKER_DIRECTORIES[$this->broker], '', $directory);
         }
     }
+	
+	/**
+	 * @return string
+	 */
     public function getDirectory(){
        return self::DIRECTORIES[$this->method].TradeImport::BROKER_DIRECTORIES[$this->broker];
     }
-
+	
+	/**
+	 * @return string
+	 */
     public function getFilePath(){
         return $this->getDirectory().$this->file->getClientOriginalName();
     }
-
+	
+	/**
+	 * @param $filename
+	 *
+	 * @return false|string
+	 */
     static public function getFileLastModificationDate($filename){
         return date("Y-m-d H:i:s", Storage::disk('local')->lastModified($filename));
     }
-
+	
+	/**
+	 * @param $filename
+	 *
+	 * @return mixed
+	 */
     static public function fileExists($filename){
         return Storage::disk('local')->exists($filename);
     }
-
+	
+	/**
+	 * @param $filename
+	 * @param $accountId
+	 *
+	 * @return array|bool
+	 */
     public function parseFile($filename,$accountId){
         $last_modified=self::getFileLastModificationDate($filename);
         //check if file already exists in the db and it's date
@@ -134,7 +198,10 @@ class IBTradeLogFile implements TradeLogProvider
         }
 
     }
-
+	
+	/**
+	 *
+	 */
     public function parseFiles(){
         if($this->getMethod()==self::MANUAL){
             $this->uploadFile();
@@ -158,7 +225,7 @@ class IBTradeLogFile implements TradeLogProvider
             if (!empty($directories)) {
                 foreach ($directories as $directory) {
                     $files = Storage::disk('local')->files($directory);
-                    $account = TradingAccount::where('account_id', $this->getAccountId())->first();
+                    $account = TradingAccount::where('account_id', $this->getAccountId($directory))->first();
                     if ($account && $account->id > 0) { //if trading account exists
                         if (!empty($files)) {
                             foreach ($files as $file) {
@@ -167,8 +234,8 @@ class IBTradeLogFile implements TradeLogProvider
                             }
                         }
                     }else {//create it
-                        TradingAccount::create(['account_id'=>$this->getAccountId(),
-                            'account_name'=> $this->getAccountId(),
+                        TradingAccount::create(['account_id'=>$this->getAccountId($directory),
+                            'account_name'=> $this->getAccountId($directory),
                             'account_type'=> '',
                         ]);
                     }
@@ -176,7 +243,11 @@ class IBTradeLogFile implements TradeLogProvider
             }
         }
     }
-
+	
+	/**
+	 * @return IBFlexQueryResultMap|IBTWSTradeExportMap|bool
+	 * @throws TradeImportException
+	 */
     public function createFileMapper(){
 
         if ($this->getBroker()==TradeImport::INTERACTIVE_BROKERS) {
@@ -190,7 +261,10 @@ class IBTradeLogFile implements TradeLogProvider
         }
         return false;
     }
-
+	
+	/**
+	 * @param array $params
+	 */
     public function buildTradeLogs(Array $params=[]){
         $this->mapper=$this->createFileMapper();
         $this->parseFiles();

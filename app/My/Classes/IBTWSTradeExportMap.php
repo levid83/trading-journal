@@ -11,6 +11,10 @@ namespace App\My\Classes;
 use App\My\Contracts\TradeImportMap;
 use App\My\Models\Asset;
 
+/**
+ * Class IBTWSTradeExportMap
+ * @package App\My\Classes
+ */
 class IBTWSTradeExportMap implements TradeImportMap
 {
     const MAP=[
@@ -48,7 +52,12 @@ class IBTWSTradeExportMap implements TradeImportMap
     private $tradeLogEntityId;
     private $data;
     private $map;
-
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return bool
+	 */
     private function isCombo($row=[]){
         if (isset($row['comb.']) && $row['comb.']!=''){
             return true;
@@ -56,7 +65,12 @@ class IBTWSTradeExportMap implements TradeImportMap
             return false;
         }
     }
-
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return array
+	 */
     private function fixPriceAndStrikePrice($row=[]){
 
         if (in_array($row['security_type'], ['FOP','FUT'])) {
@@ -83,7 +97,12 @@ class IBTWSTradeExportMap implements TradeImportMap
 
         return [$row['price'],$row['strike']];
     }
-
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return string
+	 */
     private function fixDatetime($row=[]){
 
         $row['time'] = isset($row['date']) ? substr($row['date'], 0, 4) . '-' . substr($row['date'], 4, 2) . '-'
@@ -91,25 +110,47 @@ class IBTWSTradeExportMap implements TradeImportMap
 
         return $row['time'];
     }
-
+	
+	/**
+	 * @param $accountId
+	 *
+	 * @return $this
+	 */
     public function setAccountId($accountId){
         $this->accountId=$accountId;
         return $this;
     }
-
+	
+	/**
+	 * @param $tradeLogEntityId
+	 *
+	 * @return $this
+	 */
     public function setTradeLogEntityId($tradeLogEntityId){
         $this->tradeLogEntityId=$tradeLogEntityId;
         return $this;
     }
+	
+	/**
+	 * @param $data
+	 *
+	 * @return $this
+	 */
     public function setData($data){
         $this->data=$data;
         return $this;
     }
-
+	
+	/**
+	 * @return mixed
+	 */
     public function getMap(){
         return $this->map;
     }
-
+	
+	/**
+	 * @param array $params
+	 */
     public function map(Array $params=array()){
         $this->map=[];
         if (!empty($this->data)){

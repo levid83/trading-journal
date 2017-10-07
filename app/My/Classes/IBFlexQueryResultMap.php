@@ -12,7 +12,10 @@ namespace App\My\Classes;
 use App\My\Contracts\TradeImportMap;
 use App\My\Models\Asset;
 
-
+/**
+ * Class IBFlexQueryResultMap
+ * @package App\My\Classes
+ */
 class IBFlexQueryResultMap implements TradeImportMap
 {
 
@@ -50,11 +53,19 @@ class IBFlexQueryResultMap implements TradeImportMap
     private $tradeLogEntityId;
     private $data;
     private $map;
-
+	
+	/**
+	 * IBFlexQueryResultMap constructor.
+	 */
     public function __construct(){
 
     }
-
+	
+	/**
+	 * @param $row
+	 *
+	 * @return bool
+	 */
     private function isHeader($row){
         if ($row['clientaccountid']!='ClientAccountID'){
             return false;
@@ -62,7 +73,12 @@ class IBFlexQueryResultMap implements TradeImportMap
             return true;
         }
     }
-
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return mixed|string
+	 */
     private function fixStrikePrice($row=[]){
 
         if (in_array($row['assetclass'], ['FOP'])) {
@@ -75,14 +91,24 @@ class IBFlexQueryResultMap implements TradeImportMap
         }
         return $row['strike'];
     }
-
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return mixed|string
+	 */
     private function fixPrice($row=[]){
 
         $row['price'] = (isset($row['tradeprice']) && isset($row['multiplier']))? $row['tradeprice']*$row['multiplier'] : '';
 
         return $row['price'];
     }
-
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return mixed|string
+	 */
     private function fixUnderlying($row=[]){
 
         $row['underlying'] = (isset($row['underlyingsymbol']) && $row['underlyingsymbol']!='')? $row['underlyingsymbol']
@@ -90,32 +116,59 @@ class IBFlexQueryResultMap implements TradeImportMap
 
         return $row['underlying'];
     }
-
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return string
+	 */
     private function fixDatetime($row=[]){
 
         $row['time'] = isset($row['tradedate']) && isset($row['tradetime']) ? $row['tradedate'].' '.$row['tradetime']:'';
 
         return $row['time'];
     }
-
+	
+	/**
+	 * @param $accountId
+	 *
+	 * @return $this
+	 */
     public function setAccountId($accountId){
         $this->accountId=$accountId;
         return $this;
     }
-
+	
+	/**
+	 * @param $tradeLogEntityId
+	 *
+	 * @return $this
+	 */
     public function setTradeLogEntityId($tradeLogEntityId){
         $this->tradeLogEntityId=$tradeLogEntityId;
         return $this;
     }
+	
+	/**
+	 * @param $data
+	 *
+	 * @return $this
+	 */
     public function setData($data){
         $this->data=$data;
         return $this;
     }
-
+	
+	/**
+	 * @return mixed
+	 */
     public function getMap(){
         return $this->map;
     }
-
+	
+	/**
+	 * 
+	 */
     public function map(){
         $this->map=array();
         if (!empty($this->data)) {
