@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\My\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -50,7 +50,7 @@ class Trade extends Model
      */
     public function client()
     {
-        return $this->belongsTo('App\TradingAccount', 'client_id');
+        return $this->belongsTo('App\My\Models\TradingAccount', 'client_id');
     }
 
     /**
@@ -58,7 +58,7 @@ class Trade extends Model
      */
     public function position()
     {
-        return $this->belongsTo('App\Position');
+        return $this->belongsTo('App\My\Models\Position');
     }
 
     /**
@@ -66,7 +66,7 @@ class Trade extends Model
      */
     public function strategy()
     {
-        return $this->belongsTo('App\Strategy');
+        return $this->belongsTo('App\My\Models\Strategy');
     }
 
     /**
@@ -74,7 +74,7 @@ class Trade extends Model
      */
     public function tactic()
     {
-        return $this->belongsTo('App\Tactic');
+        return $this->belongsTo('App\My\Models\Tactic');
     }
 
     /**
@@ -82,6 +82,6 @@ class Trade extends Model
      */
     public function trader()
     {
-        return $this->belongsTo('App\TradingAccount', 'trader_id');
+        return $this->belongsTo('App\My\Models\TradingAccount', 'trader_id');
     }
 }

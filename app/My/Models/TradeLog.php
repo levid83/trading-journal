@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\My\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -74,7 +74,7 @@ class TradeLog extends Model
      */
     public function tradeLogFile()
     {
-        return $this->belongsTo('App\TradeLogFile');
+        return $this->belongsTo('App\My\Models\TradeLogFile');
     }
 
     /**
@@ -82,6 +82,6 @@ class TradeLog extends Model
      */
     public function tradingAccount()
     {
-        return $this->belongsTo('App\TradingAccount');
+        return $this->belongsTo('App\My\Models\TradingAccount');
     }
 }

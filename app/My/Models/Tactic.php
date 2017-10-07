@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\My\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $description
  * @property Trade[] $trades
  */
-class Strategy extends Model
+class Tactic extends Model
 {
     /**
      * @var array
@@ -22,6 +22,6 @@ class Strategy extends Model
      */
     public function trades()
     {
-        return $this->hasMany('App\Trade');
+        return $this->hasMany('App\My\Models\Trade');
     }
 }
