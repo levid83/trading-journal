@@ -47,6 +47,7 @@ class IBFlexQueryResultMap implements TradeImportMap
         'conid' => 'conid',/* Conid  */
         'order_time' => 'ordertime',/* OrderTime  */
         'order_type' => 'ordertype',/* OrderType  */
+		'json'=>null,
     ];
 
     private $accountId;
@@ -187,7 +188,7 @@ class IBFlexQueryResultMap implements TradeImportMap
                     $aux['price'] = $this->fixPrice($row);
                     $aux['time'] = $this->fixDateTime($row);
                     $aux['underlying'] = $this->fixUnderlying($row);
-
+					$aux['json']=$row->toJson(); //save the raw json data
                     $this->map[] = $aux;
                 }
             }

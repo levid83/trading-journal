@@ -46,6 +46,7 @@ class IBTWSTradeExportMap implements TradeImportMap
         'trading_class' => 'trading_class',
         'price_incl_fees' => 'price_incl._fees',
         'open_close' => 'openclose',
+		'json'=>null,
     ];
 
     private $accountId;
@@ -152,7 +153,6 @@ class IBTWSTradeExportMap implements TradeImportMap
 	 * @param array $params
 	 */
     public function map(Array $params=array()){
-    	dd($this->data->toArray());
         $this->map=[];
         if (!empty($this->data)){
             foreach ($this->data as $row) {
@@ -167,7 +167,7 @@ class IBTWSTradeExportMap implements TradeImportMap
                     $aux['trade_log_file_id'] = $this->tradeLogEntityId;
                     list($aux['price'], $aux['strike']) = $this->fixPriceAndStrikePrice($row);
                     $aux['time'] = $this->fixDateTime($row);
-
+					$aux['json']=$row->toJson(); //save the raw json data
                     $this->map[] = $aux;
                 }
             }

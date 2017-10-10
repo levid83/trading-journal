@@ -67,7 +67,7 @@ class TradeLog extends Model
     /**
      * @var array
      */
-    protected $fillable = ['trade_log_file_id', 'trading_account_id', 'drill_down', 'underlying', 'security_type', 'last_trading_day', 'strike', 'put_call', 'currency', 'action', 'action_subtype', 'quantity', 'comb', 'description', 'financial_instrument', 'symbol', 'price', 'time', 'exchange', 'vwap_time', 'comment', 'submitter', 'order_ref', 'transaction_id', 'yield', 'tx_yield', 'commission', 'realized_pl', 'economic_value_rule', 'currency_price', 'volatility', 'vol_link', 'savings', 'key', 'destination', 'order_id', 'exch_exec_id', 'exch_order_id', 'ticket_id', 'more_info', 'trading_class', 'price_difference', 'price_incl_fees', 'account', 'cash_qty', 'clearing', 'clearing_acct', 'soft_dollars', 'open_close', 'solicited', 'solicited_by_ibroker', 'created_at', 'updated_at'];
+    protected $guarded = ['processed'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
