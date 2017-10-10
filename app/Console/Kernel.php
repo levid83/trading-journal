@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\ProcessImportedTrades;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -24,12 +25,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call('App\Http\Controllers\CsvController@automatedImport')
-            ->everyMinute()
-            ->sendOutputTo(public_path().'/tasks/log.txt');
+		$schedule->job(new ProcessImportedTrades());
 
-        // $schedule->command('inspire')
-        //          ->hourly();
+       
     }
 
     /**

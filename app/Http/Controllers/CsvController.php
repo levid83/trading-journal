@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 
+use App\Jobs\ProcessImportedTrades;
 use Illuminate\Http\Request;
 use Session;
-use App\Events\TradesImported;
+use Carbon\Carbon;
 
 use App\My\Classes\TradeImport;
 use App\My\Classes\IBTradeLogFile;
@@ -15,11 +16,12 @@ class CsvController extends Controller
 
 
     public function automatedImport(){
-         (new TradeImport(
-            new IBTradeLogFile(TradeImport::INTERACTIVE_BROKERS,IBTradeLogFile::AUTOMATED))
-        )->importTradeLogs();
-
-        event(new TradesImported());
+		$tradeImport=new TradeImport(new IBTradeLogFile(TradeImport::INTERACTIVE_BROKERS,IBTradeLogFile::AUTOMATED));
+		$tradeImport->importTradeLogs();
+		
+	
+		ProcessImportedTrades::dispatch()
+			->delay(Carbon::now()->addMinutes(10));
     }
 
     /**
@@ -54,12 +56,11 @@ class CsvController extends Controller
         ]);
 
         $file = $request->trade_file;
+	
+		$tradeImport=new TradeImport(new IBTradeLogFile(TradeImport::INTERACTIVE_BROKERS,IBTradeLogFile::MANUAL,$file));
+		$tradeImport->importTradeLogs();
 
-        (new TradeImport(
-            new IBTradeLogFile(TradeImport::INTERACTIVE_BROKERS,IBTradeLogFile::MANUAL,$file))
-        )->importTradeLogs();
-
-        event(new TradesImported());
+		ProcessImportedTrades::dispatch();
 
         if (!Session::has('error')){
             Session::flash('success', 'Csv ' . $file->getClientOriginalName() . ' imported and processed succesfully.');

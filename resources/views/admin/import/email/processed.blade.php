@@ -1,0 +1,1 @@
+The trade import list is processed
