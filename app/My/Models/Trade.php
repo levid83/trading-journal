@@ -43,7 +43,7 @@ class Trade extends Model
     /**
      * @var array
      */
-    protected $fillable = ['client_id', 'position_id', 'strategy_id', 'tactic_id', 'trader_id', 'status', 'action', 'quantity', 'security_type', 'expiration', 'strike', 'put_call', 'bid', 'ask', 'currency', 'commission_open', 'commission_close', 'profit', 'description', 'open_date', 'close_date', 'exchange', 'trading_class', 'created_at', 'updated_at', 'deleted_at'];
+    protected $guarded = ['position_id', 'strategy_id', 'tactic_id'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -84,4 +84,9 @@ class Trade extends Model
     {
         return $this->belongsTo('App\My\Models\TradingAccount', 'trader_id');
     }
+	
+	public function tradeLogs()
+	{
+		return $this->belongsToMany('App\My\Models\TradeLog','trade_log_trade');
+	}
 }

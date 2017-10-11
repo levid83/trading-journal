@@ -207,14 +207,13 @@ class IBTradeLogFile implements TradeLogProvider
             $this->uploadFile();
             if (self::fileExists($this->getFilePath())){
                 $account = TradingAccount::where('account_id', $this->getAccountId())->first();
-                if ($account->id > 0) { //if trading account exists
-                   $this->tradeLogs=$this->parseFile($this->getFilePath(), $account->id);
-                }else{ //create it
-                    TradingAccount::create(['account_id'=>$this->getAccountId(),
-                                            'account_name'=> $this->getAccountId(),
-                                            'account_type'=> '',
-                        ]);
+                if (!$account) { //if trading doesn't exist
+					$account=TradingAccount::create(['account_id'=>$this->getAccountId(),
+													 'account_name'=> $this->getAccountId(),
+													 'account_type'=> '',
+													]);
                 }
+                $this->tradeLogs=$this->parseFile($this->getFilePath(), $account->id);
 
             }else{
                 throw new FileException("File '.$this->getFilePath().' account doesn't exist!");
@@ -226,19 +225,18 @@ class IBTradeLogFile implements TradeLogProvider
                 foreach ($directories as $directory) {
                     $files = Storage::disk('local')->files($directory);
                     $account = TradingAccount::where('account_id', $this->getAccountId($directory))->first();
-                    if ($account && $account->id > 0) { //if trading account exists
-                        if (!empty($files)) {
-                            foreach ($files as $file) {
-                                $result=$this->parseFile($file,$account->id);
-                                $this->tradeLogs=array_merge($this->tradeLogs,$result);
-                            }
-                        }
-                    }else {//create it
-                        TradingAccount::create(['account_id'=>$this->getAccountId($directory),
-                            'account_name'=> $this->getAccountId($directory),
-                            'account_type'=> '',
-                        ]);
+                    if (!$account) { //if trading doesn't exist
+						$account=TradingAccount::create(['account_id'=>$this->getAccountId($directory),
+														 'account_name'=> $this->getAccountId($directory),
+														 'account_type'=> '',
+														]);
                     }
+					if (!empty($files)) {
+						foreach ($files as $file) {
+							$result=$this->parseFile($file,$account->id);
+							$this->tradeLogs=array_merge($this->tradeLogs,$result);
+						}
+					}
                 }
             }
         }

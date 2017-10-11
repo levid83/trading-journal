@@ -11,6 +11,7 @@ namespace App\My\Classes;
 
 use App\My\Contracts\TradeImportMap;
 use App\My\Models\Asset;
+use App\My\Models\TradingAccount;
 
 /**
  * Class IBFlexQueryResultMap
@@ -22,6 +23,7 @@ class IBFlexQueryResultMap implements TradeImportMap
     const MAP=[
         'trading_account_id' => null,
         'trade_log_file_id' =>null,
+        'client_id'=>null,
         'account' => 'clientaccountid',/* ClientAccountID */
         'execution_id' => 'ibexecid',/* IBExecID - IB unique execution id */
         'underlying' => 'underlyingsymbol', /* UnderlyingSymbol */
@@ -74,6 +76,51 @@ class IBFlexQueryResultMap implements TradeImportMap
             return true;
         }
     }
+	
+	private function fixOpenClose($row=[]){
+		if (isset($row['opencloseindicator'])) {
+			$str=strtoupper(trim($row['opencloseindicator']));
+			if ($str && $str[0]=='C'){
+				return TradeImport::CLOSE_TRADE;
+			}elseif($str && $str[0]=='O'){
+				return TradeImport::OPEN_TRADE;
+			}else{
+				return '';
+			}
+		}else{
+			return '';
+		}
+	}
+	
+	private function fixAction($row=[]){
+		if (isset($row['buysell'])) {
+			$str=strtoupper(trim($row['buysell']));
+			if ($str && $str[0]=='B'){
+				return TradeImport::BUY;
+			}
+			if ($str && $str[0]=='S'){
+				return TradeImport::SELL;
+			}
+			return '';
+		}else{
+			return '';
+		}
+	}
+	private function fixPutCall($row=[]){
+		if (isset($row['buysell'])) {
+			$str = strtoupper(trim($row['putcall']));
+			if ($str && $str[0] == 'P') {
+				return TradeImport::PUT;
+			} elseif ($str && $str[0] == 'C') {
+				return TradeImport::CALL;
+			} else {
+				return '';
+			}
+		}else{
+			return '';
+		}
+		
+	}
 	
 	/**
 	 * @param array $row
@@ -129,6 +176,18 @@ class IBFlexQueryResultMap implements TradeImportMap
 
         return $row['time'];
     }
+    
+	private function setClientId($row){
+		$account=TradingAccount::where('account_id',$row['clientaccountid'])->orWhere('account_name',$row['clientaccountid'])->first();
+		if (!$account){
+			$account=TradingAccount::create(['account_id'=>$row['clientaccountid'],
+											 'account_name'=> $row['clientaccountid'],
+											 'account_type'=> '',
+											]);
+		}
+		$row['client_id'] = $account->id;
+		return $row['client_id'];
+	}
 	
 	/**
 	 * @param $accountId
@@ -181,9 +240,12 @@ class IBFlexQueryResultMap implements TradeImportMap
                             $aux[$key] = $row[$item];
                         }
                     }
-
+					$aux['client_id']=$this->setClientId($row);
                     $aux['trading_account_id'] = $this->accountId;
                     $aux['trade_log_file_id'] = $this->tradeLogEntityId;
+					$aux['open_close']=$this->fixOpenClose($row);
+					$aux['action']=$this->fixAction($row);
+					$aux['put_call']=$this->fixPutCall($row);
                     $aux['strike'] = $this->fixStrikePrice($row);
                     $aux['price'] = $this->fixPrice($row);
                     $aux['time'] = $this->fixDateTime($row);

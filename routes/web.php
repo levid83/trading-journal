@@ -17,6 +17,9 @@ Route::get('/', function () {
 
 Route::get('/import/csv/automated-import', 'CsvController@automatedImport')->name('csv.automated-import');
 
+Route::get('/import/csv/process-trade-log', 'CsvController@processTradeLog')->name('csv.process-trade-log');
+Route::get('/import/csv/reset-trade-log', 'CsvController@resetTradeLogProcessing')->name('csv.reset-trade-log');
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');

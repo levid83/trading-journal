@@ -10,6 +10,7 @@ namespace App\My\Classes;
 
 use App\My\Contracts\TradeImportMap;
 use App\My\Models\Asset;
+use App\My\Models\TradingAccount;
 
 /**
  * Class IBTWSTradeExportMap
@@ -20,6 +21,7 @@ class IBTWSTradeExportMap implements TradeImportMap
     const MAP=[
         'trading_account_id' => null,
         'trade_log_file_id' =>null,
+		'client_id'=>null,
         'account' => 'account',
         'execution_id' => 'id',
         'underlying' => 'underlying',
@@ -67,6 +69,53 @@ class IBTWSTradeExportMap implements TradeImportMap
         }
     }
 	
+	private function fixOpenClose($row=[]){
+    	if (isset($row['openclose'])) {
+			$str = strtoupper(trim($row['openclose']));
+			if ($str && $str[0] == 'C') {
+				return TradeImport::CLOSE_TRADE;
+			} elseif ($str && $str[0] == 'O') {
+				return TradeImport::OPEN_TRADE;
+			} else {
+				return '';
+			}
+		}else{
+    		return '';
+		}
+	}
+	
+	private function fixAction($row=[]){
+		if (isset($row['action'])) {
+			$str = strtoupper(trim($row['action']));
+			if ($str && $str[0] == 'B') {
+				return TradeImport::BUY;
+			}
+			if ($str && $str[0] == 'S') {
+				return TradeImport::SELL;
+			}
+			
+			return '';
+		}else{
+			return '';
+		}
+		
+	}
+	private function fixPutCall($row=[]){
+		if (isset($row['putcall'])) {
+			$str = strtoupper(trim($row['putcall']));
+			if ($str && $str[0] == 'P') {
+				return TradeImport::PUT;
+			} elseif ($str && $str[0] == 'C') {
+				return TradeImport::CALL;
+			} else {
+				return '';
+			}
+		}else{
+			return '';
+		}
+		
+	}
+ 
 	/**
 	 * @param array $row
 	 *
@@ -112,6 +161,18 @@ class IBTWSTradeExportMap implements TradeImportMap
         return $row['time'];
     }
 	
+    private function setClientId($row){
+ 		$account=TradingAccount::where('account_id',$row['account'])->orWhere('account_name',$row['account'])->first();
+    	if (!$account){
+			$account=TradingAccount::create(['account_id'=>$row['account'],
+											 'account_name'=> $row['account'],
+											 'account_type'=> '',
+											]);
+		}
+		$row['client_id'] = $account->id;
+		return $row['client_id'];
+	}
+ 
 	/**
 	 * @param $accountId
 	 *
@@ -163,8 +224,12 @@ class IBTWSTradeExportMap implements TradeImportMap
                             $aux[$key] = $row[$item];
                         }
                     }
+					$aux['client_id']=$this->setClientId($row);
                     $aux['trading_account_id'] = $this->accountId;
                     $aux['trade_log_file_id'] = $this->tradeLogEntityId;
+                    $aux['open_close']=$this->fixOpenClose($row);
+					$aux['action']=$this->fixAction($row);
+					$aux['put_call']=$this->fixPutCall($row);
                     list($aux['price'], $aux['strike']) = $this->fixPriceAndStrikePrice($row);
                     $aux['time'] = $this->fixDateTime($row);
 					$aux['json']=$row->toJson(); //save the raw json data

@@ -2,15 +2,17 @@
 
 namespace App\My\Models;
 
+use Faker\Provider\DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
  * @property int $trade_log_file_id
  * @property int $trading_account_id
+ * @property int $client_id
  * @property string $drill_down
  * @property string $underlying
- * @property string $security_type
+ * @property string $asset_class
  * @property string $last_trading_day
  * @property float $strike
  * @property string $put_call
@@ -59,6 +61,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $solicited_by_ibroker
  * @property string $created_at
  * @property string $updated_at
+ * @property float $costbasis
+ * @property string conid
+ * @property string order_time
+ * @property string order_type
+ * @property text json
+ * @property boolean processed
  * @property TradeLogFile $tradeLogFile
  * @property TradingAccount $tradingAccount
  */
@@ -84,4 +92,9 @@ class TradeLog extends Model
     {
         return $this->belongsTo('App\My\Models\TradingAccount');
     }
+	
+	public function trades()
+	{
+		return $this->belongsToMany('App\My\Models\Trade','trade_log_trade');
+	}
 }
