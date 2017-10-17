@@ -10,6 +10,7 @@ namespace App\My\Classes;
 
 use App\My\Contracts\TradeImportMap;
 use App\My\Models\Asset;
+use App\My\Models\Trade;
 use App\My\Models\TradingAccount;
 
 /**
@@ -73,9 +74,9 @@ class IBTWSTradeExportMap implements TradeImportMap
     	if (isset($row['openclose'])) {
 			$str = strtoupper(trim($row['openclose']));
 			if ($str && $str[0] == 'C') {
-				return TradeImport::CLOSE_TRADE;
+				return Trade::CLOSE_TRADE;
 			} elseif ($str && $str[0] == 'O') {
-				return TradeImport::OPEN_TRADE;
+				return Trade::OPEN_TRADE;
 			} else {
 				return '';
 			}
@@ -88,10 +89,10 @@ class IBTWSTradeExportMap implements TradeImportMap
 		if (isset($row['action'])) {
 			$str = strtoupper(trim($row['action']));
 			if ($str && $str[0] == 'B') {
-				return TradeImport::BUY;
+				return Trade::BUY;
 			}
 			if ($str && $str[0] == 'S') {
-				return TradeImport::SELL;
+				return Trade::SELL;
 			}
 			
 			return '';
@@ -104,9 +105,9 @@ class IBTWSTradeExportMap implements TradeImportMap
 		if (isset($row['putcall'])) {
 			$str = strtoupper(trim($row['putcall']));
 			if ($str && $str[0] == 'P') {
-				return TradeImport::PUT;
+				return Trade::PUT;
 			} elseif ($str && $str[0] == 'C') {
-				return TradeImport::CALL;
+				return Trade::CALL;
 			} else {
 				return '';
 			}

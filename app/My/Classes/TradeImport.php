@@ -22,23 +22,14 @@ class TradeImport
     const AMERITRADE=2;
     const BROKER_DIRECTORIES=[1=>'InteractiveBrokers/',2=>'Ameritrade/'];
 	
-	const OPEN_TRADE='OPEN';
-	const CLOSE_TRADE='CLOSE';
-	
-	const BUY='BUY';
-	const SELL='SELL';
-	
-	const PUT='PUT';
-	const CALL='CALL';
-    
-    private $tradeLogProvider=null;
+	private $tradeLogProvider=null;
 	
 	/**
 	 * TradeImport constructor.
 	 *
 	 * @param TradeLogProvider $tradeLogProvider
 	 */
-    public function __construct(TradeLogProvider $tradeLogProvider){
+    public function __construct(TradeLogProvider $tradeLogProvider=null){
         $this->tradeLogProvider=$tradeLogProvider;
     }
 
@@ -59,7 +50,7 @@ class TradeImport
         }
     }
 	
-	static private function getUnprocessedTradeLogs(){
+	private function getUnprocessedTradeLogs(){
 		//those who have no trades attached and processed is 0
 		return TradeLog::doesntHave('trades')
 			->where('processed',0)
@@ -71,7 +62,7 @@ class TradeImport
 		
 	}
 	
-	static private function getTradeOpenPair(TradeLog $tradeLog){
+	private function getTradeOpenPair(TradeLog $tradeLog){
 		return Trade::where('underlying',$tradeLog->underlying)
 			->where('status', 'OPEN')
 			->where('expiration',$tradeLog->last_trading_day)
@@ -81,7 +72,7 @@ class TradeImport
 			->first();
 	}
 	
-	static private function isDuplicatedOpenTrade(TradeLog $tradeLog){
+	private function isDuplicatedOpenTrade(TradeLog $tradeLog){
 		return Trade::where('underlying',$tradeLog->underlying)
 			->where('expiration',$tradeLog->last_trading_day)
 			->where('strike',$tradeLog->strike)
@@ -91,7 +82,7 @@ class TradeImport
 			->first();
 	}
 	
-	static private function isDuplicatedCloseTrade(TradeLog $tradeLog){
+	private function isDuplicatedCloseTrade(TradeLog $tradeLog){
 		return Trade::where('underlying',$tradeLog->underlying)
 			->where('expiration',$tradeLog->last_trading_day)
 			->where('strike',$tradeLog->strike)
@@ -101,9 +92,9 @@ class TradeImport
 			->first();
 	}
 	
-	static private function processOpenTrade(TradeLog $tradeLog){
+	private function processOpenTrade(TradeLog $tradeLog){
 		//check for duplication
-		if (!self::isDuplicatedOpenTrade($tradeLog)) {
+		if (!$this->isDuplicatedOpenTrade($tradeLog)) {
 			$record = ['trader_id'       => $tradeLog->trading_account_id,
 					   'client_id'       => $tradeLog->client_id,
 					   'underlying'      => $tradeLog->underlying,
@@ -122,7 +113,7 @@ class TradeImport
 					   'exchange'        => $tradeLog->exchange,
 					   'trading_class'   => $tradeLog->trading_class,
 			];
-			if ($tradeLog->action == TradeImport::BUY) {
+			if ($tradeLog->action == Trade::BUY) {
 				$record['ask'] = abs($tradeLog->price);
 			} else {
 				$record['bid'] = abs($tradeLog->price);
@@ -135,9 +126,9 @@ class TradeImport
 		}
 	}
 	
-	static private function processCloseTrade(TradeLog $tradeLog){
-		$tradePair=self::getTradeOpenPair($tradeLog);
-		if(!self::isDuplicatedCloseTrade($tradeLog) && !empty($tradePair)){//check for duplication and for open trade
+	private function processCloseTrade(TradeLog $tradeLog){
+		$tradePair=$this->getTradeOpenPair($tradeLog);
+		if(!$this->isDuplicatedCloseTrade($tradeLog) && !empty($tradePair)){//check for duplication and for open trade
 			$record=[ 'trader_id' =>	$tradeLog->trading_account_id,
 					  'client_id'=>		$tradeLog->client_id,
 					  'underlying'=>	$tradeLog->underlying,
@@ -157,7 +148,7 @@ class TradeImport
 					  'trading_class' =>$tradeLog->trading_class,
 			];
 			
-			if ($tradeLog->action==TradeImport::BUY){
+			if ($tradeLog->action== Trade::BUY){
 				$record['ask']=abs($tradeLog->price);
 			}else{
 				$record['bid']=abs($tradeLog->price);
@@ -172,7 +163,7 @@ class TradeImport
 		}
 	}
 	
-	static private function processUndefinedTrades(TradeLog $tradeLog){
+	private function processUndefinedTrades(TradeLog $tradeLog){
 	
 	}
 	
@@ -187,21 +178,21 @@ class TradeImport
         DB::commit();
     }
 	
-	static public function processTradeLog(){
+	public function processTradeLog(){
 		DB::beginTransaction();
 
-		$tradeLogs=self::getUnprocessedTradeLogs();
+		$tradeLogs=$this->getUnprocessedTradeLogs();
 
 		if (!empty($tradeLogs)){
 			foreach ($tradeLogs as $tradeLog){
-				if ($tradeLog->open_close==TradeImport::CLOSE_TRADE){
-					self::processCloseTrade($tradeLog);
+				if ($tradeLog->open_close== Trade::CLOSE_TRADE){
+					$this->processCloseTrade($tradeLog);
 				}
-				if ($tradeLog->open_close==TradeImport::OPEN_TRADE){
-					self::processOpenTrade($tradeLog);
+				if ($tradeLog->open_close== Trade::OPEN_TRADE){
+					$this->processOpenTrade($tradeLog);
 				}
 				if ($tradeLog->open_close==''){
-					//self::processUndefinedTrade($tradeLog);
+					//$this->processUndefinedTrade($tradeLog);
 				}
 			}
 		}

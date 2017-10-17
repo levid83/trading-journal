@@ -74,8 +74,8 @@ class CsvController extends Controller
 	}
 	
 	public function processTradeLog(){
-
-		TradeImport::processTradeLog();
+		$tradeImport=new TradeImport();
+		$tradeImport->processTradeLog();
 		
 	}
 	

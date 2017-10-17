@@ -11,6 +11,7 @@ namespace App\My\Classes;
 
 use App\My\Contracts\TradeImportMap;
 use App\My\Models\Asset;
+use App\My\Models\Trade;
 use App\My\Models\TradingAccount;
 
 /**
@@ -81,9 +82,9 @@ class IBFlexQueryResultMap implements TradeImportMap
 		if (isset($row['opencloseindicator'])) {
 			$str=strtoupper(trim($row['opencloseindicator']));
 			if ($str && $str[0]=='C'){
-				return TradeImport::CLOSE_TRADE;
+				return Trade::CLOSE_TRADE;
 			}elseif($str && $str[0]=='O'){
-				return TradeImport::OPEN_TRADE;
+				return Trade::OPEN_TRADE;
 			}else{
 				return '';
 			}
@@ -96,10 +97,10 @@ class IBFlexQueryResultMap implements TradeImportMap
 		if (isset($row['buysell'])) {
 			$str=strtoupper(trim($row['buysell']));
 			if ($str && $str[0]=='B'){
-				return TradeImport::BUY;
+				return Trade::BUY;
 			}
 			if ($str && $str[0]=='S'){
-				return TradeImport::SELL;
+				return Trade::SELL;
 			}
 			return '';
 		}else{
@@ -110,9 +111,9 @@ class IBFlexQueryResultMap implements TradeImportMap
 		if (isset($row['buysell'])) {
 			$str = strtoupper(trim($row['putcall']));
 			if ($str && $str[0] == 'P') {
-				return TradeImport::PUT;
+				return Trade::PUT;
 			} elseif ($str && $str[0] == 'C') {
-				return TradeImport::CALL;
+				return Trade::CALL;
 			} else {
 				return '';
 			}

@@ -40,7 +40,17 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Trade extends Model
 {
-    /**
+	
+	const OPEN_TRADE  = 'OPEN';
+	const CLOSE_TRADE = 'CLOSE';
+	
+	const BUY         = 'BUY';
+	const SELL        = 'SELL';
+	
+	const PUT         = 'PUT';
+	const CALL        = 'CALL';
+	
+	/**
      * @var array
      */
     protected $guarded = ['position_id', 'strategy_id', 'tactic_id'];
