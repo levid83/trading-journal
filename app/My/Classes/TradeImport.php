@@ -65,7 +65,7 @@ class TradeImport
 	private function getTradeOpenPair(TradeLog $tradeLog){
 		return Trade::where('underlying',$tradeLog->underlying)
 			->where('status', 'OPEN')
-			->where('expiration',$tradeLog->last_trading_day)
+			->where('expiration',$tradeLog->expiry)
 			->where('strike',$tradeLog->strike)
 			->where('put_call',$tradeLog->put_call)
 			->where('asset_class',$tradeLog->asset_class)
@@ -74,7 +74,7 @@ class TradeImport
 	
 	private function isDuplicatedOpenTrade(TradeLog $tradeLog){
 		return Trade::where('underlying',$tradeLog->underlying)
-			->where('expiration',$tradeLog->last_trading_day)
+			->where('expiration',$tradeLog->expiry)
 			->where('strike',$tradeLog->strike)
 			->where('put_call',$tradeLog->put_call)
 			->where('asset_class',$tradeLog->asset_class)
@@ -84,7 +84,7 @@ class TradeImport
 	
 	private function isDuplicatedCloseTrade(TradeLog $tradeLog){
 		return Trade::where('underlying',$tradeLog->underlying)
-			->where('expiration',$tradeLog->last_trading_day)
+			->where('expiration',$tradeLog->expiry)
 			->where('strike',$tradeLog->strike)
 			->where('put_call',$tradeLog->put_call)
 			->where('asset_class',$tradeLog->asset_class)
@@ -102,7 +102,7 @@ class TradeImport
 					   'action'          => $tradeLog->action,
 					   'quantity'        => abs($tradeLog->quantity),
 					   'asset_class'     => $tradeLog->asset_class,
-					   'expiration'      => $tradeLog->last_trading_day,
+					   'expiration'      => $tradeLog->expiry,
 					   'strike'          => $tradeLog->strike,
 					   'put_call'        => $tradeLog->put_call,
 					   'currency'        => $tradeLog->currency,
@@ -136,7 +136,7 @@ class TradeImport
 					  'action' => 		$tradeLog->action,
 					  'quantity' => 	abs($tradeLog->quantity),
 					  'asset_class' =>	$tradeLog->asset_class,
-					  'expiration' => 	$tradeLog->last_trading_day,
+					  'expiration' => 	$tradeLog->expiry,
 					  'strike' => 		$tradeLog->strike,
 					  'put_call' => 	$tradeLog->put_call,
 					  'currency' =>		$tradeLog->currency,
@@ -185,11 +185,12 @@ class TradeImport
 
 		if (!empty($tradeLogs)){
 			foreach ($tradeLogs as $tradeLog){
-				if ($tradeLog->open_close== Trade::CLOSE_TRADE){
-					$this->processCloseTrade($tradeLog);
-				}
+				
 				if ($tradeLog->open_close== Trade::OPEN_TRADE){
 					$this->processOpenTrade($tradeLog);
+				}
+				if ($tradeLog->open_close== Trade::CLOSE_TRADE){
+					$this->processCloseTrade($tradeLog);
 				}
 				if ($tradeLog->open_close==''){
 					//$this->processUndefinedTrade($tradeLog);

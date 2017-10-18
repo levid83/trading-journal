@@ -25,9 +25,10 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::group(['prefix' => 'admin', 'middleware'=>['auth']], function () {
-
-    Voyager::routes();
-
-    Route::get('/import/csv/bulk-import/create', 'CsvController@create')->name('import.csv.bulk-import.create');
+	
+	Voyager::routes();
+	
+	Route::get('/import/csv/bulk-import/create', 'CsvController@create')->name('import.csv.bulk-import.create');
     Route::post('/import/csv/bulk-import/store', 'CsvController@store')->name('import.csv.bulk-import.store');
+	
 });

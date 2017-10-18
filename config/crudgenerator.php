@@ -2,7 +2,7 @@
 
 return [
 
-    'custom_template' => false,
+    'custom_template' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ return [
     /**
      * Columns number to show in view's table.
      */
-    'view_columns_number' => 3,
+    'view_columns_number' => 20,
 
     /**
      * Delimiter for template vars
