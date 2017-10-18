@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $drill_down
  * @property string $underlying
  * @property string $asset_class
- * @property string $last_trading_day
+ * @property string expiry
  * @property float $strike
  * @property string $put_call
  * @property string $currency
