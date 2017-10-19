@@ -9,31 +9,27 @@
             <div class="panel panel-default">
                 <div class="panel-heading">%%crudNameCap%%</div>
                 <div class="panel-body">
-                    <a href="{{ url('/%%routeGroup%%%%viewName%%/create') }}" class="btn btn-success btn-sm" title="Add New %%modelName%%">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Add New
-                    </a>
 
-                    <form method="GET" action="{{ url('/%%routeGroup%%%%viewName%%') }}" accept-charset="UTF-8" class="navbar-form navbar-right" role="search">
-                        <div class="form-group">
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="search" placeholder="Search...">
-                            </div>
-                            <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-                        </div>
-                    </form>
+                     @include ('%%viewTemplateDir%%.toolbar')
 
-                    <br/>
-                    <br/>
                     <div class="table-responsive">
                         <table class="table-condensed table-borderless ">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th>#</th>%%formHeadingHtml%%<th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                             @foreach($%%crudName%% as $item)
                                 <tr>
+                                    <td>
+                                     <div class="checkbox">
+                                        <label>
+                                            <input name="%%primaryKey%%[{{$item->%%primaryKey%%}}]" type="checkbox" value="0">
+                                        </label>
+                                     </div>
+                                    </td>
                                     <td>{{ $loop->iteration or $item->%%primaryKey%% }}</td>
                                     %%formBodyHtml%%
                                     <td>
