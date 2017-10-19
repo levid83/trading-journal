@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         //$this->call(VoyagerDatabaseSeeder::class);
         //$this->call(VoyagerDummyDatabaseSeeder::class);
 
-        $this->call(AssetsTableSeeder::class);
+        //$this->call(AssetsTableSeeder::class);
+		$this->call(TacticsTableSeeder::class);
     }
 }
