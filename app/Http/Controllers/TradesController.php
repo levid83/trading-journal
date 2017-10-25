@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\My\Models\Tactic;
 use App\My\Models\Trade;
 use Illuminate\Http\Request;
 use Session;
+use DB;
 
 class TradesController extends Controller
 {
@@ -18,16 +20,31 @@ class TradesController extends Controller
      */
     public function index(Request $request)
     {
-        $keyword = $request->get('search');
-        $perPage = 25;
-
-        if (!empty($keyword)) {
-            $trades = Trade::sortable()->paginate($perPage);
-        } else {
-            $trades = Trade::sortable()->paginate($perPage);
-        }
-
-        return view('admin.trades.index', compact('trades'));
+		$trades = Trade::with('tactic')
+			->with('position')
+			->filterUnderlying($request->input('underlying'))
+			->filterPosition($request->input('position_id'))
+			->filterTactic($request->input('tactic_id'))
+			->filterStatus($request->input('status'))
+			->filterAssetClass($request->input('asset_class'))
+			->filterAction($request->input('action'))
+			->filterStrike($request->input('strike'))
+			->filterPutCall($request->input('put_call'))
+			->filterExpiry($request->input('expiration_from'),$request->input('expiration_to'))
+			->filterOpenDate($request->input('open_date_from'),$request->input('open_date_to'))
+			->filterCloseDate($request->input('close_date_from'),$request->input('close_date_to'))
+			->sortable()->paginate(50);
+   
+		$request->flash();
+		
+        return view('admin.trades.index')
+			->with('trades',$trades)
+			->with('trade_types',Trade::TRADE_TPYES)
+			->with('asset_classes',Trade::ASSET_CLASSES)
+			->with('trade_actions',Trade::ACTIONS)
+			->with('option_types',Trade::OPTION_TYPES)
+			->with('tactics',Tactic::all())
+			;
     }
 
     /**

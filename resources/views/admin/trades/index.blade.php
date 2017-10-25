@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="page-content browse container-fluid">
-    <form method="post" action="{{ url('/admin/trades') }}" accept-charset="UTF-8" class="form-inline">
+    <form method="post" action="{{ url('/admin/trades') }}" accept-charset="UTF-8" class="form-horizontal">
         {{ csrf_field() }}
         {{ method_field('POST') }}
     @include ('admin.trades.toolbar')
@@ -27,6 +27,7 @@
             <div id="trades_list" class="panel-collapse collapse in">
                 <div class="panel-body">
                     <div class="table-responsive">
+                        <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page')))->render() !!} </div>
                         <table class="table-condensed table-borderless ">
                             <thead>
                             <tr>
@@ -38,7 +39,7 @@
                                 <th>@sortablelink('asset_class','Asset Class')</th>
                                 <th>@sortablelink('action','Action')</th>
                                 <th>Quantity</th>
-                                <th>@sortablelink('expiration','Expiration')</th>
+                                <th>@sortablelink('expiration','Expiry')</th>
                                 <th>@sortablelink('strike','Strike')</th>
                                 <th>@sortablelink('put_call','Put Call')</th>
                                 <th>Ask</th>
@@ -63,7 +64,23 @@
                                     </div>
                                 </td>
                                 <td>{{ $item->id }}</td>
-                                <td>{{ $item->underlying }}</td><td>{{ $item->position_id }}</td><td>{{ $item->tactic_id }}</td><td>{{ $item->asset_class }}</td><td>{{ $item->action }}</td><td>{{ $item->quantity }}</td><td>{{ $item->expiration }}</td><td>{{ $item->strike }}</td><td>{{ $item->put_call }}</td><td>{{ $item->ask }}</td><td>{{ $item->bid }}</td><td>{{ $item->commission_open }}</td><td>{{ $item->commission_close }}</td><td>{{ $item->profit }}</td><td>{{ $item->open_date }}</td><td>{{ $item->close_date }}</td><td>{{ $item->status }}</td>
+                                <td>{{ $item->underlying }}</td>
+                                <td>@if($item->position){{$item->position->counter }}@endif</td>
+                                <td>@if($item->tactic){{$item->tactic->name }}@endif</td>
+                                <td>{{ $item->asset_class }}</td>
+                                <td>{{ $item->action }}</td>
+                                <td>{{ $item->quantity }}</td>
+                                <td>{{ date('Y-m-d',strtotime($item->expiration)) }}</td>
+                                <td>{{ $item->strike }}</td>
+                                <td>{{ $item->put_call }}</td>
+                                <td>{{ $item->ask }}</td>
+                                <td>{{ $item->bid }}</td>
+                                <td>{{ $item->commission_open }}</td>
+                                <td>{{ $item->commission_close }}</td>
+                                <td>{{ $item->profit }}</td>
+                                <td>{{ $item->open_date }}</td>
+                                <td>{{ $item->close_date }}</td>
+                                <td>{{ $item->status }}</td>
                                 <td>
                                    <a href="{{ url('/admin/trades/' . $item->id . '/edit') }}" title="Edit trade"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
                                 </td>
@@ -71,7 +88,7 @@
                             @endforeach
                             </tbody>
                         </table>
-                        <div class="pagination-wrapper"> {!! $trades->appends(['search' => Request::get('search')])->render() !!} </div>
+                        <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page')))->render() !!} </div>
                     </div>
                 </div>
             </div>

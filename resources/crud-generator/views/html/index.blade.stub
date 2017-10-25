@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="page-content browse container-fluid">
-    <form method="post" action="{{ url('/%%routeGroup%%%%viewName%%') }}" accept-charset="UTF-8" class="form-inline">
+    <form method="post" action="{{ url('/%%routeGroup%%%%viewName%%') }}" accept-charset="UTF-8" class="form-horizontal">
         {{ csrf_field() }}
         {{ method_field('POST') }}
     @include ('%%viewTemplateDir%%.toolbar')

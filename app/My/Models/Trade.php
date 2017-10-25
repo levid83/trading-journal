@@ -4,6 +4,7 @@ namespace App\My\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Kyslik\ColumnSortable\Sortable;
+use PhpParser\Node\Expr\Array_;
 
 /**
  * @property int $id
@@ -42,6 +43,11 @@ use Kyslik\ColumnSortable\Sortable;
 class Trade extends Model
 {
 	use Sortable;
+	
+	const TRADE_TPYES=['CLOSE'=>'CLOSE','OPEN'=>'OPEN'];
+	const ASSET_CLASSES=['FOP'=>'FOP','FUT'=>'FUT','OPT'=>'OPT','STK'=>'STK'];
+	const ACTIONS=['BUY'=>'BUY','SELL'=>'SELL'];
+	const OPTION_TYPES=['CALL'=>'CALL','PUT'=>'PUT'];
 	
 	const OPEN_TRADE  = 'OPEN';
 	const CLOSE_TRADE = 'CLOSE';
@@ -102,5 +108,170 @@ class Trade extends Model
 	public function tradeLogs()
 	{
 		return $this->belongsToMany('App\My\Models\TradeLog','trade_log_trade');
+	}
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $underlying
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterUnderLying($query, $underlying){
+
+		if ($underlying!=''){
+			$query->where('underlying','like',$underlying.'%');
+		}
+ 		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $position
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterPosition($query, $position){
+		
+		if ($position!=''){
+			$query->where('position_id',$position);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $tactic
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterTactic($query, $tactic){
+		
+		if ($tactic!=''){
+			$query->where('tactic_id',$tactic);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $status
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterStatus($query, $status){
+		
+		if ($status!=''){
+			$query->where('status',$status);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $assetClass
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterAssetClass($query, $assetClass){
+		
+		if ($assetClass!=''){
+			$query->where('asset_class',$assetClass);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $action
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterAction($query, $action){
+		
+		if ($action!=''){
+			$query->where('action',$action);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $strike
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterStrike($query, $strike){
+		
+		if ($strike!=''){
+			$query->where('strike',$strike);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $putCall
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterPutCall($query, $putCall){
+		
+		if ($putCall!=''){
+			$query->where('put_call',$putCall);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $startDate
+	 * @param mixed $endDate
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterExpiry($query, $startDate, $endDate){
+		
+		if ($startDate!=''){
+			$query->where('expiration','>=',$startDate);
+		}
+		if ($endDate!=''){
+			$query->where('expiration','<=',$endDate);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $startDate
+	 * @param mixed $endDate
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterOpenDate($query, $startDate, $endDate){
+		
+		if ($startDate!=''){
+			$query->where('open_date','>=',$startDate);
+		}
+		if ($endDate!=''){
+			$query->where('open_date','<=',$endDate);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $startDate
+	 * @param mixed $endDate
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterCloseDate($query, $startDate, $endDate){
+		
+		if ($startDate!=''){
+			$query->where('close_date','>=',$startDate);
+		}
+		if ($endDate!=''){
+			$query->where('close_date','<=',$endDate);
+		}
+		return $query;
 	}
 }
