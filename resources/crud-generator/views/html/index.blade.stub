@@ -2,56 +2,64 @@
 
 
 @section('content')
-
 <div class="page-content browse container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">%%crudNameCap%%</div>
+    <form method="post" action="{{ url('/%%routeGroup%%%%viewName%%') }}" accept-charset="UTF-8" class="form-inline">
+        {{ csrf_field() }}
+        {{ method_field('POST') }}
+    @include ('%%viewTemplateDir%%.toolbar')
+    <div class="panel-group" id="accordion">
+        <div class="panel panel-default" id="%%crudName%%_filter_panel">
+            <div class="panel-heading">
+                <h5 class="panel-title">
+                    <a data-toggle="collapse" data-target="#%%crudName%%_filterbar" href="#%%crudName%%_filterbar" class="collapsed">FilterBar</a>
+                </h5>
+            </div>
+            <div id="%%crudName%%_filterbar" class="panel-collapse collapse">
+                <div class="panel-body">@include ('%%viewTemplateDir%%.filterbar')</div>
+            </div>
+        </div>
+        <div class="panel panel-default" id="%%crudName%%_lsit_panel">
+            <div class="panel-heading">
+                <h5 class="panel-title">
+                    <a data-toggle="collapse" data-target="#%%crudName%%_list" href="#%%crudName%%_list" >%%crudNameCap%%</a>
+                </h5>
+            </div>
+            <div id="%%crudName%%_list" class="panel-collapse collapse in">
                 <div class="panel-body">
-
-                     @include ('%%viewTemplateDir%%.toolbar')
-
                     <div class="table-responsive">
                         <table class="table-condensed table-borderless ">
                             <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>#</th>%%formHeadingHtml%%<th>Actions</th>
-                                </tr>
+                            <tr>
+                                <th></th>
+                                <th>#</th>%%formHeadingHtml%%<th>Actions</th>
+                            </tr>
                             </thead>
                             <tbody>
                             @foreach($%%crudName%% as $item)
-                                <tr>
-                                    <td>
-                                     <div class="checkbox">
+                            <tr>
+                                <td>
+                                    <div class="checkbox">
                                         <label>
-                                            <input name="%%primaryKey%%[{{$item->%%primaryKey%%}}]" type="checkbox" value="0">
+                                            <input name="%%primaryKey%%[{{$item->%%primaryKey%%}}]" type="checkbox" value="1">
                                         </label>
-                                     </div>
-                                    </td>
-                                    <td>{{ $loop->iteration or $item->%%primaryKey%% }}</td>
-                                    %%formBodyHtml%%
-                                    <td>
-                                        <a href="{{ url('/%%routeGroup%%%%viewName%%/' . $item->%%primaryKey%%) }}" title="View %%modelName%%"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
-                                        <a href="{{ url('/%%routeGroup%%%%viewName%%/' . $item->%%primaryKey%% . '/edit') }}" title="Edit %%modelName%%"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
-
-                                        <form method="POST" action="{{ url('/%%routeGroup%%%%viewName%%' . '/' . $item->%%primaryKey%%) }}" accept-charset="UTF-8" style="display:inline">
-                                            {{ method_field('DELETE') }}
-                                            {{ csrf_field() }}
-                                            <button type="submit" class="btn btn-danger btn-xs" title="Delete %%modelName%%" onclick="return confirm(&quot;Confirm delete?&quot;)"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
+                                    </div>
+                                </td>
+                                <td>{{ $loop->iteration or $item->%%primaryKey%% }}</td>
+                                %%formBodyHtml%%
+                                <td>
+                                    <a href="{{ url('/%%routeGroup%%%%viewName%%/' . $item->%%primaryKey%%) }}" title="View %%modelName%%"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
+                                    <a href="{{ url('/%%routeGroup%%%%viewName%%/' . $item->%%primaryKey%% . '/edit') }}" title="Edit %%modelName%%"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
+                                </td>
+                            </tr>
                             @endforeach
                             </tbody>
                         </table>
                         <div class="pagination-wrapper"> {!! $%%crudName%%->appends(['search' => Request::get('search')])->render() !!} </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
+    </form>
 </div>
 @endsection

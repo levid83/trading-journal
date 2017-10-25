@@ -1,0 +1,12 @@
+<div class="row">
+    <div class="col-md-12">
+        %%formFieldsHtml%%
+        <div class="form-group">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search" placeholder="Search...">
+            </div>
+            <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+        </div>
+    </div>
+</div>
+

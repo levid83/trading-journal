@@ -1,17 +1,18 @@
-<div class="row">
- <div class="col-md-6">
-     <a href="{{ url('/%%routeGroup%%%%viewName%%/create') }}" class="btn btn-success btn-sm" title="Add New %%modelName%%">
-         <i class="fa fa-plus" aria-hidden="true"></i> Add New %%modelName%%
-     </a>
- </div>
- <div class="col-md-6">
-     <form method="GET" action="{{ url('/%%routeGroup%%%%viewName%%') }}" accept-charset="UTF-8" class="navbar-form navbar-right" role="search">
-        <div class="form-group">
-            <div class="input-group">
-                <input type="text" class="form-control" name="search" placeholder="Search...">
-            </div>
-            <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-        </div>
-     </form>
- </div>
-</div>
+<nav class="navbar-toolbar-left">
+    <div class="collapse navbar-collapse" id="%%crudName%%_navbar">
+        <ul class="nav navbar-nav">
+            <li>
+                 <button href="{{ url('/%%routeGroup%%%%viewName%%/create') }}" class="btn btn-info">
+                    Add New %%modelName%%
+                 </button>
+            </li>
+            <li></li>
+            <li>
+               <button  name="add_new_group" type="submit" class="btn btn-info">Add new group</button>
+            </li>
+            <li>
+                <button  name="add_to_group" type="submit" class="btn btn-info">Add to group</button>
+            </li>
+        </ul>
+    </div>
+</nav>
