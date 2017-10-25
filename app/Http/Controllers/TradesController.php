@@ -22,9 +22,9 @@ class TradesController extends Controller
         $perPage = 25;
 
         if (!empty($keyword)) {
-            $trades = Trade::paginate($perPage);
+            $trades = Trade::sortable()->paginate($perPage);
         } else {
-            $trades = Trade::paginate($perPage);
+            $trades = Trade::sortable()->paginate($perPage);
         }
 
         return view('admin.trades.index', compact('trades'));

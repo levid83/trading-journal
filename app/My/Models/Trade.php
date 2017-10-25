@@ -3,6 +3,7 @@
 namespace App\My\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Kyslik\ColumnSortable\Sortable;
 
 /**
  * @property int $id
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Trade extends Model
 {
+	use Sortable;
 	
 	const OPEN_TRADE  = 'OPEN';
 	const CLOSE_TRADE = 'CLOSE';
@@ -54,6 +56,8 @@ class Trade extends Model
      * @var array
      */
     protected $guarded = ['position_id', 'strategy_id', 'tactic_id'];
+    
+    public $sortable=['id','underlying','asset_class','action','expiration','strike','put_call','profit','open_date','close_date','status'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

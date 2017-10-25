@@ -170,6 +170,8 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
         TCG\Voyager\VoyagerServiceProvider::class,
+		
+		Kyslik\ColumnSortable\ColumnSortableServiceProvider::class,
 
         /*
          * Application Service Providers...
