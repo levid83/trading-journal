@@ -2,7 +2,10 @@
 
 namespace App\My\Models;
 
+use App\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Kyslik\ColumnSortable\Sortable;
 use PhpParser\Node\Expr\Array_;
 
@@ -64,23 +67,23 @@ class Trade extends Model
     protected $guarded = ['position_id', 'strategy_id', 'tactic_id'];
     
     public $sortable=['id','underlying','asset_class','action','expiration','strike','put_call','profit','open_date','close_date','status'];
-
-    
+		
+	//mutators
     public function getRoundedAskAttribute(){
-    	return round($this->ask,2);
+    	return (!is_null($this->ask)?round($this->ask,2):null);
 	}
 	public function getRoundedBidAttribute(){
-		return round($this->bid,2);
+		return (!is_null($this->bid)?round($this->bid,2):null);
 	}
 	public function getRoundedStrikeAttribute(){
-		return round($this->strike,2);
+		return (!is_null($this->strike)?round($this->strike,2):null);
 	}
 	
 	public function getRoundedProfitAttribute(){
-		return round($this->profit,2);
+		return (!is_null($this->profit)?round($this->profit,2):null);
 	}
 	public function getFormatedExpirationAttribute(){
-    	return date("Md'y",strtotime($this->expiration));
+    	return (!is_null($this->expiration)?date("Md'y",strtotime($this->expiration)):null);
 	}
     
     public function getTradeFullNameAttribute(){
@@ -101,7 +104,9 @@ class Trade extends Model
 			}
 		}
 	}
-    
+ 
+	//relations
+	
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -146,6 +151,26 @@ class Trade extends Model
 	{
 		return $this->belongsToMany('App\My\Models\TradeLog','trade_log_trade');
 	}
+	
+	//scopes
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param \App\User $user
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeUserAllowedTrades($query, User $user=null){
+		if(!is_null($user) && !$user->isSuperAdmin()) {
+			//the user can access his own trades only
+				$query->whereHas('trader.user', function ($query) {
+					$query->where('id', Auth::user()->id);
+				});
+		}
+		
+		return $query;
+	}
+	
 	/**
 	 *
 	 * @param \Illuminate\Database\Eloquent\Builder $query

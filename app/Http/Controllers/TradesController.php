@@ -22,9 +22,11 @@ class TradesController extends Controller
 	private function updateTactics($tacticId, Array $trades){
 		if (!empty($trades) && $tacticId>0){
 			foreach ($trades as $id){
-				$trade=Trade::find($id);
-				$trade->tactic_id=$tacticId;
-				$trade->save();
+				$trade = Trade::find($id);
+				if (Auth::user()->can('update',$trade)) {
+					$trade->tactic_id = $tacticId;
+					$trade->save();
+				}
 			}
 		}
 	}
@@ -33,8 +35,10 @@ class TradesController extends Controller
 		if (!empty($trades)){
 			foreach ($trades as $id){
 				$trade=Trade::find($id);
-				$trade->tactic_id=null;
-				$trade->save();
+				if (Auth::user()->can('update',$trade)) {
+					$trade->tactic_id = null;
+					$trade->save();
+				}
 			}
 		}
 	}
@@ -48,9 +52,11 @@ class TradesController extends Controller
 			$position->save();
 
 			foreach ($trades as $id){
-				$trade=Trade::find($id);
-				$trade->position_id=$position->id;
-				$trade->save();
+				$trade = Trade::find($id);
+				if (Auth::user()->can('update',$trade)) {
+					$trade->position_id = $position->id;
+					$trade->save();
+				}
 			}
 			
 			$position->generateName();
@@ -63,8 +69,10 @@ class TradesController extends Controller
 			//@todo update the position params
 			foreach ($trades as $id){
 				$trade=Trade::find($id);
-				$trade->position_id=$positionId;
-				$trade->save();
+				if (Auth::user()->can('update',$trade)) {
+					$trade->position_id = $positionId;
+					$trade->save();
+				}
 			}
 			
 			$position=Position::find($positionId);
@@ -105,10 +113,11 @@ class TradesController extends Controller
 		}else{
     		Session::flash("error","You have no permission to update these trades");
 		}
-    
+
 		$trades = Trade::with('tactic')
 			->with('position')
 			->with('trader')
+			->userAllowedTrades(Auth::user()) //only the user's trades
 			->filterTrader($request->input('filter_trader_id'))
 			->filterUnderlying($request->input('filter_underlying'))
 			->filterPosition($request->input('filter_position_id'))
@@ -123,7 +132,7 @@ class TradesController extends Controller
 			->filterCloseDate($request->input('filter_close_date_from'),$request->input('filter_close_date_to'))
 			->sortable()
 			->simplePaginate(30);
-			
+
 		$request->flashExcept(['trade']);
 		
         return view('admin.trades.index')
