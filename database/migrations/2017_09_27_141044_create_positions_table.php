@@ -16,7 +16,8 @@ class CreatePositionsTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('counter');
-			$table->string('name', 100)->nullable();
+			$table->text('name')->nullable();
+			$table->timestamps();
 		});
 	}
 
