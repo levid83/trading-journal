@@ -15,7 +15,7 @@ class AddForeignKeysToTradeLogsTable extends Migration {
 		Schema::table('trade_logs', function(Blueprint $table)
 		{
 			$table->foreign('trade_log_file_id', 'FK_trade_logs_trade_log_file_id')->references('id')->on('trade_log_files')->onUpdate('RESTRICT')->onDelete('RESTRICT');
-			$table->foreign('trading_account_id', 'FK_trade_logs_trading_account_id')->references('id')->on('trading_accounts')->onUpdate('RESTRICT')->onDelete('RESTRICT');
+			$table->foreign('trader_id', 'FK_trade_logs_trader_id')->references('id')->on('trading_accounts')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 		});
 	}
 
@@ -30,7 +30,7 @@ class AddForeignKeysToTradeLogsTable extends Migration {
 		Schema::table('trade_logs', function(Blueprint $table)
 		{
 			$table->dropForeign('FK_trade_logs_trade_log_file_id');
-			$table->dropForeign('FK_trade_logs_trading_account_id');
+			$table->dropForeign('FK_trade_logs_trader_id');
 		});
 	}
 

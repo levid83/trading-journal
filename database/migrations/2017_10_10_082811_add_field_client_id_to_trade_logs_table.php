@@ -17,7 +17,7 @@ class AddFieldClientIdToTradeLogsTable extends Migration
 			$table->integer('client_id')
 				->nullable()
 				->unsigned()
-				->after('trading_account_id')
+				->after('trader_id')
 				->index('FK_trade_logs_client_id');
 			$table->foreign('client_id', 'FK_trade_logs_client_id')
 				->references('id')
@@ -26,7 +26,7 @@ class AddFieldClientIdToTradeLogsTable extends Migration
 				->onDelete('RESTRICT');
 			
 			$table->foreign('trade_log_file_id', 'FK_trade_logs_trade_log_file_id')->references('id')->on('trade_log_files')->onUpdate('RESTRICT')->onDelete('RESTRICT');
-			$table->foreign('trading_account_id', 'FK_trade_logs_trading_account_id')->references('id')->on('trading_accounts')->onUpdate('RESTRICT')->onDelete('RESTRICT');
+			$table->foreign('trader_id', 'FK_trade_logs_trader_id')->references('id')->on('trading_accounts')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 			
 		});
     }
@@ -45,7 +45,7 @@ class AddFieldClientIdToTradeLogsTable extends Migration
 			$table->dropColumn('client_id');
 			
 			$table->dropForeign('trade_log_file_id');
-			$table->dropForeign('trading_account_id');
+			$table->dropForeign('trader_id');
 			
 		});
     }

@@ -15,7 +15,7 @@ class CreateTradeLogsTable extends Migration {
 		Schema::create('trade_logs', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('trading_account_id')->unsigned()->index('FK_trade_logs_trading_account_id');
+			$table->integer('trader_id')->unsigned()->index('FK_trade_logs_trader_id');
 			$table->integer('trade_log_file_id')->unsigned()->nullable()->index('FK_trade_logs_trade_log_file_id');
 			$table->string('drill_down', 191)->nullable();
 			$table->char('underlying', 10);

@@ -40,9 +40,9 @@ class TradeImport
         if (!empty($data)) {
             $new_values=[];
             foreach ($data as $key => $row) {
-                $duplication = TradeLog::where('execution_id', $row['execution_id'])->get();
+                $duplication = TradeLog::where('order_id', $row['order_id'])->get();
                 if ($duplication->count() > 0) {
-                    TradeLog::where('execution_id', $row['execution_id'])->update($row);
+                    TradeLog::where('order_id', $row['order_id'])->update($row);
                 } else {
                     TradeLog::insert($row);
                 }
@@ -94,8 +94,8 @@ class TradeImport
 	
 	private function processOpenTrade(TradeLog $tradeLog){
 		//check for duplication
-		if (!$this->isDuplicatedOpenTrade($tradeLog)) {
-			$record = ['trader_id'       => $tradeLog->trading_account_id,
+		if (1==1 /*!$this->isDuplicatedOpenTrade($tradeLog)*/) {
+			$record = ['trader_id'       => $tradeLog->trader_id,
 					   'client_id'       => $tradeLog->client_id,
 					   'underlying'      => $tradeLog->underlying,
 					   'status'          => 'OPEN',
@@ -132,8 +132,8 @@ class TradeImport
 	
 	private function processCloseTrade(TradeLog $tradeLog){
 		$tradePair=$this->getTradeOpenPair($tradeLog);
-		if(!$this->isDuplicatedCloseTrade($tradeLog) && !empty($tradePair)){//check for duplication and for open trade
-			$record=[ 'trader_id' =>	$tradeLog->trading_account_id,
+		if(/*!$this->isDuplicatedCloseTrade($tradeLog) && */!empty($tradePair)){//check for duplication and for open trade
+			$record=[ 'trader_id' =>	$tradeLog->trader_id,
 					  'client_id'=>		$tradeLog->client_id,
 					  'underlying'=>	$tradeLog->underlying,
 					  'status' => 		'CLOSED',
@@ -151,14 +151,21 @@ class TradeImport
 					  'trading_class' =>$tradeLog->trading_class,
 			];
 			
-			if ($tradeLog->action== Trade::BUY){
-				$record['ask']=abs($tradeLog->price);
-				$record['profit']=$this->calculateProfit($record['quantity'],$record['ask'], $tradePair->bid, $tradePair->commission_open, $record['commission_close']);
+			if(abs($tradeLog->quantity)>abs($tradePair->quantity)){
+				$quantity=abs($tradePair->quantity);
+				$remaining_quantity=abs($tradeLog->quantity)-abs($tradePair->quantity);
 			}else{
-				$record['bid']=abs($tradeLog->price);
-				$record['profit']=$this->calculateProfit($record['quantity'],$tradePair->ask , $record['bid'], $tradePair->commission_open, $record['commission_close']);
+				$quantity=abs($tradeLog->quantity);
+				$remaining_quantity=0;
 			}
 			
+			if ($tradeLog->action== Trade::BUY){
+				$record['ask']=abs($tradeLog->price);
+				$record['profit']=$this->calculateProfit($quantity,$record['ask'], $tradePair->bid, $tradePair->commission_open, $record['commission_close']);
+			}else{
+				$record['bid']=abs($tradeLog->price);
+				$record['profit']=$this->calculateProfit($quantity,$tradePair->ask , $record['bid'], $tradePair->commission_open, $record['commission_close']);
+			}
 			
 			
 			Trade::where('id',$tradePair->id)->update($record);
@@ -166,6 +173,11 @@ class TradeImport
 			$tradeLog->trades()->attach($tradePair->id);
 			$tradeLog->processed=true;
 			$tradeLog->save();
+			
+			if($remaining_quantity>0){
+				$tradeLog->quantity=$remaining_quantity;
+				$this->processCloseTrade($tradeLog);
+			}
 			
 		}
 	}
@@ -189,16 +201,25 @@ class TradeImport
 		DB::beginTransaction();
 
 		$tradeLogs=$this->getUnprocessedTradeLogs();
-
-		if (!empty($tradeLogs)){
-			foreach ($tradeLogs as $tradeLog){
+		if (!empty($tradeLogs)) {
+			foreach ($tradeLogs as $tradeLog) {
 				
-				if ($tradeLog->open_close== Trade::OPEN_TRADE){
+				if ($tradeLog->open_close == Trade::OPEN_TRADE) {
 					$this->processOpenTrade($tradeLog);
 				}
-				if ($tradeLog->open_close== Trade::CLOSE_TRADE){
+			}
+		}
+		$tradeLogs=$this->getUnprocessedTradeLogs();
+		if (!empty($tradeLogs)) {
+			foreach ($tradeLogs as $tradeLog) {
+				if ($tradeLog->open_close == Trade::CLOSE_TRADE) {
 					$this->processCloseTrade($tradeLog);
 				}
+			}
+		}
+		$tradeLogs=$this->getUnprocessedTradeLogs();
+		if (!empty($tradeLogs)) {
+			foreach ($tradeLogs as $tradeLog) {
 				if ($tradeLog->open_close==''){
 					//$this->processUndefinedTrade($tradeLog);
 				}

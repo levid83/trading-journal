@@ -42,8 +42,6 @@ class ProcessImportedTrades implements ShouldQueue
     {
 		DB::beginTransaction();
     	$tradeLogs=$this->getUnprocessedTradeLogs();
-       	dd($tradeLogs);
-       	
        	
 		DB::commit();
     	

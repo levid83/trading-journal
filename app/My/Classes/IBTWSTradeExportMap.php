@@ -20,7 +20,7 @@ use App\My\Models\TradingAccount;
 class IBTWSTradeExportMap implements TradeImportMap
 {
     const MAP=[
-        'trading_account_id' => null,
+        'trader_id' => null,
         'trade_log_file_id' =>null,
 		'client_id'=>null,
         'account' => 'account',
@@ -226,7 +226,7 @@ class IBTWSTradeExportMap implements TradeImportMap
                         }
                     }
 					$aux['client_id']=$this->setClientId($row);
-                    $aux['trading_account_id'] = $this->accountId;
+                    $aux['trader_id'] = $this->accountId;
                     $aux['trade_log_file_id'] = $this->tradeLogEntityId;
                     $aux['open_close']=$this->fixOpenClose($row);
 					$aux['action']=$this->fixAction($row);
