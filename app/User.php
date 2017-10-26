@@ -2,12 +2,15 @@
 
 namespace App;
 
+use App\My\Models\TradingAccount;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends \TCG\Voyager\Models\User
 {
     use Notifiable;
+    
+    const SUPERUSER_ROLE_ID=1;
 
     /**
      * The attributes that are mass assignable.
@@ -26,4 +29,12 @@ class User extends \TCG\Voyager\Models\User
     protected $hidden = [
         'password', 'remember_token',
     ];
+    
+    public function tradingAccounts(){
+    	return $this->hasMany(TradingAccount::class);
+	}
+	
+	public function isSuperAdmin(){
+    	return $this->role_id==self::SUPERUSER_ROLE_ID;
+	}
 }

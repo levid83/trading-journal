@@ -2,6 +2,7 @@
 
 namespace App\My\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -19,6 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class TradingAccount extends Model
 {
+	const TRADER='trader';
+	const CLIENT='client';
+	
     /**
      * @var array
      */
@@ -55,4 +59,8 @@ class TradingAccount extends Model
     {
         return $this->hasMany('App\My\Models\Trade', 'trader_id');
     }
+    
+    public function user(){
+    	return $this->belongsTo(User::class);
+	}
 }
