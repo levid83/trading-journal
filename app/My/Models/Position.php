@@ -3,6 +3,7 @@
 namespace App\My\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @property int $id
@@ -22,6 +23,13 @@ class Position extends Model
      */
     public function trades()
     {
-        return $this->hasMany('App\My\Models\Trade');
+        return $this->hasMany(Trade::class);
     }
+    
+    public function generateName(){
+    	if(!is_null($this->id )) {
+			$trades=Trade::where('position_id', $this->id)->orderBy('open_date','asc')->get();
+			$this->name=$trades->implode('TradeFullName',', ');
+		}
+	}
 }

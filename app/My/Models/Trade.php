@@ -65,6 +65,43 @@ class Trade extends Model
     
     public $sortable=['id','underlying','asset_class','action','expiration','strike','put_call','profit','open_date','close_date','status'];
 
+    
+    public function getRoundedAskAttribute(){
+    	return round($this->ask,2);
+	}
+	public function getRoundedBidAttribute(){
+		return round($this->bid,2);
+	}
+	public function getRoundedStrikeAttribute(){
+		return round($this->strike,2);
+	}
+	
+	public function getRoundedProfitAttribute(){
+		return round($this->profit,2);
+	}
+	public function getFormatedExpirationAttribute(){
+    	return date("Md'y",strtotime($this->expiration));
+	}
+    
+    public function getTradeFullNameAttribute(){
+     	if (in_array($this->asset_class,[self::ASSET_CLASSES['STK'],self::ASSET_CLASSES['FUT']])){
+    		if ($this->action==self::ACTIONS['BUY']) {
+				return "{$this->action[0]}{$this->quantity}{$this->underlying}@{$this->roundedAsk}";
+			}
+			if ($this->action==self::ACTIONS['SELL']) {
+				return "{$this->action[0]}{$this->quantity}{$this->underlying}@{$this->roundedBid}";
+			}
+		}else{
+			
+			if ($this->action==self::ACTIONS['BUY']) {
+				return "{$this->underlying}-{$this->action[0]}{$this->quantity}-{$this->formatedExpiration}-{$this->roundedStrike}{$this->put_call[0]}@{$this->roundedAsk}";
+			}
+			if ($this->action==self::ACTIONS['SELL']) {
+				return "{$this->underlying}-{$this->action[0]}{$this->quantity}-{$this->formatedExpiration}-{$this->roundedStrike}{$this->put_call[0]}@{$this->roundedBid}";
+			}
+		}
+	}
+    
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -108,6 +145,19 @@ class Trade extends Model
 	public function tradeLogs()
 	{
 		return $this->belongsToMany('App\My\Models\TradeLog','trade_log_trade');
+	}
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $trader
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterTrader($query, $trader){
+
+		if ($trader!=''){
+			$query->where('trader_id','like',$trader.'%');
+		}
+ 		return $query;
 	}
 	/**
 	 *
