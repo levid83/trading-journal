@@ -6,7 +6,6 @@
     <form method="post" action="{{ url('/admin/trades') }}" accept-charset="UTF-8" class="form-horizontal">
         {{ csrf_field() }}
         {{ method_field('POST') }}
-    @include ('admin.trades.toolbar')
     <div class="panel-group" id="accordion">
         <div class="panel panel-default" id="trades_filter_panel">
             <div class="panel-heading">
@@ -27,15 +26,25 @@
             <div id="trades_list" class="panel-collapse collapse in">
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page')))->render() !!} </div>
-                        <table class="table-condensed table-borderless ">
+                        <div>
+                            <div class="col-md-9">
+                                @include ('admin.trades.toolbar')
+                            </div>
+                            <div class="col-md-3">
+                                <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page','trade')))->render() !!} </div>
+                            </div>
+                        </div>
+                        <table class="table-condensed table-borderless">
                             <thead>
                             <tr>
                                 <th></th>
                                 <th>@sortablelink('id')</th>
+                                @if(Auth::user()->isSuperAdmin())
+                                <th>Trader</th>
+                                @endif
                                 <th>@sortablelink('underlying','Underlying')</th>
-                                <th>Position Id</th>
-                                <th>Tactic Id</th>
+                                <th>@sortablelink('position_id','Position Id')</th>
+                                <th>@sortablelink('tactic.name','Tactic')</th>
                                 <th>@sortablelink('asset_class','Asset Class')</th>
                                 <th>@sortablelink('action','Action')</th>
                                 <th>Quantity</th>
@@ -59,25 +68,28 @@
                                 <td>
                                     <div class="checkbox">
                                         <label>
-                                            <input name="id[{{$item->id}}]" type="checkbox" value="1">
+                                            <input name="trade[{{$item->id}}]" type="checkbox" value="{{$item->id}}">
                                         </label>
                                     </div>
                                 </td>
                                 <td>{{ $item->id }}</td>
+                                @if(Auth::user()->isSuperAdmin())
+                                <td>{{ $item->trader->account_id }}</td>
+                                @endif
                                 <td>{{ $item->underlying }}</td>
-                                <td>@if($item->position){{$item->position->counter }}@endif</td>
+                                <td title="@if($item->position){{$item->position->name}}@endif">@if($item->position){{$item->position->id }}@endif</td>
                                 <td>@if($item->tactic){{$item->tactic->name }}@endif</td>
                                 <td>{{ $item->asset_class }}</td>
                                 <td>{{ $item->action }}</td>
                                 <td>{{ $item->quantity }}</td>
                                 <td>{{ date('Y-m-d',strtotime($item->expiration)) }}</td>
-                                <td>{{ $item->strike }}</td>
+                                <td>{{ $item->roundedStrike }}</td>
                                 <td>{{ $item->put_call }}</td>
-                                <td>{{ $item->ask }}</td>
-                                <td>{{ $item->bid }}</td>
+                                <td>{{ $item->roundedAsk }}</td>
+                                <td>{{ $item->roundedBid }}</td>
                                 <td>{{ $item->commission_open }}</td>
                                 <td>{{ $item->commission_close }}</td>
-                                <td>{{ $item->profit }}</td>
+                                <td>{{ $item->roundedProfit }}</td>
                                 <td>{{ $item->open_date }}</td>
                                 <td>{{ $item->close_date }}</td>
                                 <td>{{ $item->status }}</td>
@@ -88,7 +100,7 @@
                             @endforeach
                             </tbody>
                         </table>
-                        <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page')))->render() !!} </div>
+                        <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page','trade')))->render() !!} </div>
                     </div>
                 </div>
             </div>

@@ -6,7 +6,6 @@
     <form method="post" action="{{ url('/%%routeGroup%%%%viewName%%') }}" accept-charset="UTF-8" class="form-horizontal">
         {{ csrf_field() }}
         {{ method_field('POST') }}
-    @include ('%%viewTemplateDir%%.toolbar')
     <div class="panel-group" id="accordion">
         <div class="panel panel-default" id="%%crudName%%_filter_panel">
             <div class="panel-heading">
@@ -27,6 +26,14 @@
             <div id="%%crudName%%_list" class="panel-collapse collapse in">
                 <div class="panel-body">
                     <div class="table-responsive">
+                        <div>
+                            <div class="col-md-9">
+                                @include ('%%viewTemplateDir%%.toolbar')
+                            </div>
+                            <div class="col-md-3">
+                                <div class="pagination-wrapper"> {!! $%%crudName%%->appends(Request::except(array('page')))->render() !!} </div>
+                            </div>
+                        </div>
                         <table class="table-condensed table-borderless ">
                             <thead>
                             <tr>
@@ -40,7 +47,7 @@
                                 <td>
                                     <div class="checkbox">
                                         <label>
-                                            <input name="%%primaryKey%%[{{$item->%%primaryKey%%}}]" type="checkbox" value="1">
+                                            <input name="%%crudName%%[{{$item->%%primaryKey%%}}]" type="checkbox" value="1">
                                         </label>
                                     </div>
                                 </td>
@@ -54,7 +61,7 @@
                             @endforeach
                             </tbody>
                         </table>
-                        <div class="pagination-wrapper"> {!! $%%crudName%%->appends(['search' => Request::get('search')])->render() !!} </div>
+                        <div class="pagination-wrapper"> {!! $%%crudName%%->appends(Request::except(array('page')))->render() !!} </div>
                     </div>
                 </div>
             </div>

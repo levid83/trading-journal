@@ -1,18 +1,14 @@
-<nav class="navbar-toolbar-left">
-    <div class="collapse navbar-collapse" id="%%crudName%%_navbar">
-        <ul class="nav navbar-nav">
-            <li>
-                 <button href="{{ url('/%%routeGroup%%%%viewName%%/create') }}" class="btn btn-info">
-                    Add New %%modelName%%
-                 </button>
-            </li>
-            <li></li>
-            <li>
-               <button  name="add_new_group" type="submit" class="btn btn-info">Add new group</button>
-            </li>
-            <li>
-                <button  name="add_to_group" type="submit" class="btn btn-info">Add to group</button>
-            </li>
-        </ul>
-    </div>
-</nav>
+<ul class="list-inline">
+    <li>
+         <button href="{{ url('/%%routeGroup%%%%viewName%%/create') }}" class="btn btn-info">
+            Add New %%modelName%%
+         </button>
+    </li>
+    <li></li>
+    <li>
+       <button  name="add_new_group" type="submit" class="btn btn-info">Add new group</button>
+    </li>
+    <li>
+        <button  name="add_to_group" type="submit" class="btn btn-info">Add to group</button>
+    </li>
+</ul>

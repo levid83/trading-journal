@@ -5,14 +5,93 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\My\Models\Position;
+use App\My\Models\TradingAccount;
+use App\User;
 use App\My\Models\Tactic;
 use App\My\Models\Trade;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Expr\Array_;
 use Session;
 use DB;
+use TCG\Voyager\Facades\Voyager;
 
 class TradesController extends Controller
 {
+	private function updateTactics($tacticId, Array $trades){
+		if (!empty($trades) && $tacticId>0){
+			foreach ($trades as $id){
+				$trade=Trade::find($id);
+				$trade->tactic_id=$tacticId;
+				$trade->save();
+			}
+		}
+	}
+	
+	private function removeTactics(Array $trades){
+		if (!empty($trades)){
+			foreach ($trades as $id){
+				$trade=Trade::find($id);
+				$trade->tactic_id=null;
+				$trade->save();
+			}
+		}
+	}
+	
+	private function createNewPosition(Array $trades){
+		if (!empty($trades)){
+			//@todo set the position params
+			$position=new Position();
+			$position->counter=1;
+			$position->name='';
+			$position->save();
+
+			foreach ($trades as $id){
+				$trade=Trade::find($id);
+				$trade->position_id=$position->id;
+				$trade->save();
+			}
+			
+			$position->generateName();
+			$position->save();
+		}
+	}
+	
+	private function updatePositions($positionId, Array $trades){
+		if (!empty($trades) && $positionId>0){
+			//@todo update the position params
+			foreach ($trades as $id){
+				$trade=Trade::find($id);
+				$trade->position_id=$positionId;
+				$trade->save();
+			}
+			
+			$position=Position::find($positionId);
+			$position->generateName();
+			$position->save();
+		}
+	}
+	
+	private function editTrades(Request $request){
+		if (!empty($request->trade)) {
+			if ($request->has('add_tactic') && isset($request->tactic_id)) {
+				$this->updateTactics($request->tactic_id, $request->trade);
+			}
+			if ($request->has('remove_tactic')) {
+				$this->removeTactics($request->trade);
+			}
+			
+			if ($request->has('add_new_position')) {
+				$this->createNewPosition($request->trade);
+			}
+			
+			if ($request->has('add_to_position') && isset($request->position_id)) {
+				$this->updatePositions($request->position_id, $request->trade);
+			}
+		}
+	}
+	
     /**
      * Display a listing of the resource.
      *
@@ -20,31 +99,42 @@ class TradesController extends Controller
      */
     public function index(Request $request)
     {
+    
+    	if(Voyager::can('edit_trades')){
+    		$this->editTrades($request);
+		}else{
+    		Session::flash("error","You have no permission to update these trades");
+		}
+    
 		$trades = Trade::with('tactic')
 			->with('position')
-			->filterUnderlying($request->input('underlying'))
-			->filterPosition($request->input('position_id'))
-			->filterTactic($request->input('tactic_id'))
-			->filterStatus($request->input('status'))
-			->filterAssetClass($request->input('asset_class'))
-			->filterAction($request->input('action'))
-			->filterStrike($request->input('strike'))
-			->filterPutCall($request->input('put_call'))
-			->filterExpiry($request->input('expiration_from'),$request->input('expiration_to'))
-			->filterOpenDate($request->input('open_date_from'),$request->input('open_date_to'))
-			->filterCloseDate($request->input('close_date_from'),$request->input('close_date_to'))
-			->sortable()->paginate(50);
-   
-		$request->flash();
+			->with('trader')
+			->filterTrader($request->input('filter_trader_id'))
+			->filterUnderlying($request->input('filter_underlying'))
+			->filterPosition($request->input('filter_position_id'))
+			->filterTactic($request->input('filter_tactic_id'))
+			->filterStatus($request->input('filter_status'))
+			->filterAssetClass($request->input('filter_asset_class'))
+			->filterAction($request->input('filter_action'))
+			->filterStrike($request->input('filter_strike'))
+			->filterPutCall($request->input('filter_put_call'))
+			->filterExpiry($request->input('filter_expiration_from'),$request->input('filter_expiration_to'))
+			->filterOpenDate($request->input('filter_open_date_from'),$request->input('filter_open_date_to'))
+			->filterCloseDate($request->input('filter_close_date_from'),$request->input('filter_close_date_to'))
+			->sortable()
+			->simplePaginate(30);
+			
+		$request->flashExcept(['trade']);
 		
         return view('admin.trades.index')
 			->with('trades',$trades)
+			->with('traders',TradingAccount::where('account_type',TradingAccount::TRADER)->get())
 			->with('trade_types',Trade::TRADE_TPYES)
 			->with('asset_classes',Trade::ASSET_CLASSES)
 			->with('trade_actions',Trade::ACTIONS)
 			->with('option_types',Trade::OPTION_TYPES)
 			->with('tactics',Tactic::all())
-			;
+			->with('positions',Position::all());
     }
 
     /**
