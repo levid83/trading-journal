@@ -167,7 +167,7 @@ class IBTWSTradeExportMap implements TradeImportMap
     	if (!$account){
 			$account=TradingAccount::create(['account_id'=>$row['account'],
 											 'account_name'=> $row['account'],
-											 'account_type'=> '',
+											 'account_type'=> 'client',
 											]);
 		}
 		$row['client_id'] = $account->id;

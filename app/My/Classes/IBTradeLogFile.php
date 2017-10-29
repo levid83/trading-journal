@@ -210,7 +210,7 @@ class IBTradeLogFile implements TradeLogProvider
                 if (!$account) { //if trading doesn't exist
 					$account=TradingAccount::create(['account_id'=>$this->getAccountId(),
 													 'account_name'=> $this->getAccountId(),
-													 'account_type'=> '',
+													 'account_type'=> 'trader',
 													]);
                 }
                 $this->tradeLogs=$this->parseFile($this->getFilePath(), $account->id);
@@ -228,7 +228,7 @@ class IBTradeLogFile implements TradeLogProvider
                     if (!$account) { //if trading doesn't exist
 						$account=TradingAccount::create(['account_id'=>$this->getAccountId($directory),
 														 'account_name'=> $this->getAccountId($directory),
-														 'account_type'=> '',
+														 'account_type'=> 'trader',
 														]);
                     }
 					if (!empty($files)) {

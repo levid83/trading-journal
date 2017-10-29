@@ -78,6 +78,34 @@ class IBFlexQueryResultMap implements TradeImportMap
         }
     }
 	
+	/**
+	 * @param array $row
+	 *
+	 * @return mixed|string
+	 */
+	private function fixUnderlyingSymbol($row=[]){
+		
+		if (in_array($row['assetclass'], ['FOP'])) {
+			$row['underlyingsymbol'] = str_before($row['description'],' ');
+		}else{
+		
+		}
+		return $row['underlyingsymbol'];
+	}
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return mixed|string
+	 */
+	private function fixUnderlying($row=[]){
+		
+		$row['underlying'] = (isset($row['underlyingsymbol']) && $row['underlyingsymbol']!='')? $row['underlyingsymbol']
+			: (isset($row['symbol']) ? $row['symbol'] : ''); /* UnderlyingSymbol or Symbol */
+		
+		return $row['underlying'];
+	}
+ 
 	private function fixOpenClose($row=[]){
 		if (isset($row['opencloseindicator'])) {
 			$str=strtoupper(trim($row['opencloseindicator']));
@@ -131,7 +159,7 @@ class IBFlexQueryResultMap implements TradeImportMap
     private function fixStrikePrice($row=[]){
 
         if (in_array($row['assetclass'], ['FOP'])) {
-            $asset = Asset::where('symbol', $row['underlying'])->first();
+            $asset = Asset::where('aliases', 'like', '%'.$row['underlying'].'%')->first();
             if ($asset) {
                 if ($asset->price_correction!=1){
                     $row['strike'] = isset($row['strike']) ? $row['strike']*$asset->price_correction:'';
@@ -156,19 +184,6 @@ class IBFlexQueryResultMap implements TradeImportMap
 	/**
 	 * @param array $row
 	 *
-	 * @return mixed|string
-	 */
-    private function fixUnderlying($row=[]){
-
-        $row['underlying'] = (isset($row['underlyingsymbol']) && $row['underlyingsymbol']!='')? $row['underlyingsymbol']
-            : (isset($row['symbol']) ? $row['symbol'] : ''); /* UnderlyingSymbol or Symbol */
-
-        return $row['underlying'];
-    }
-	
-	/**
-	 * @param array $row
-	 *
 	 * @return string
 	 */
     private function fixDatetime($row=[]){
@@ -183,7 +198,7 @@ class IBFlexQueryResultMap implements TradeImportMap
 		if (!$account){
 			$account=TradingAccount::create(['account_id'=>$row['clientaccountid'],
 											 'account_name'=> $row['clientaccountid'],
-											 'account_type'=> '',
+											 'account_type'=> 'client',
 											]);
 		}
 		$row['client_id'] = $account->id;
@@ -244,13 +259,17 @@ class IBFlexQueryResultMap implements TradeImportMap
 					$aux['client_id']=$this->setClientId($row);
                     $aux['trader_id'] = $this->accountId;
                     $aux['trade_log_file_id'] = $this->tradeLogEntityId;
+					//!!! fix the $row not $aux
+					$row['underlyingsymbol'] = $this->fixUnderlyingSymbol($row);
+					
+					$aux['underlying'] = $this->fixUnderlying($row);
 					$aux['open_close']=$this->fixOpenClose($row);
 					$aux['action']=$this->fixAction($row);
 					$aux['put_call']=$this->fixPutCall($row);
                     $aux['strike'] = $this->fixStrikePrice($row);
                     $aux['price'] = $this->fixPrice($row);
                     $aux['time'] = $this->fixDateTime($row);
-                    $aux['underlying'] = $this->fixUnderlying($row);
+                   
 					$aux['json']=$row->toJson(); //save the raw json data
                     $this->map[] = $aux;
                 }
