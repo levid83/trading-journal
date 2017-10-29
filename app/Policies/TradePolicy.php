@@ -50,13 +50,18 @@ class TradePolicy
      */
     public function update(User $user, Trade $trade)
     {
-		$result=Trade::where('id',$trade->id)
+		$result=$user->whereHas('tradingAccounts',
+						function($query) use ($trade){
+							$query->where('id',$trade->trader_id)->where('account_type','trader');
+						}
+				)->first();
+		/*	Trade::where('id',$tr/ade->id)
 					->whereHas('trader.user',
 							function($query) use ($user){
 								$query->where('id',$user->id);
 							}
 					)
-				->first();
+				->first();*/
         return !empty($result);
     }
 
