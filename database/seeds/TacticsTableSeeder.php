@@ -52,7 +52,10 @@ class TacticsTableSeeder extends Seeder
 					  ['name'=>'Short Straddle'],
 					  ['name'=>'Short Strangle'],
 					  ['name'=>'Skip Strike Butterfly w/Calls'],
-					  ['name'=>'Skip Strike Butterfly w/Puts']]
+					  ['name'=>'Skip Strike Butterfly w/Puts'],
+				   	  ['name'=>'Long Underlying'],
+					  ['name'=>'Short Underlying'],
+						   ]
 			);
     }
 }
