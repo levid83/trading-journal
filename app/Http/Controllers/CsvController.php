@@ -79,20 +79,4 @@ class CsvController extends Controller
 		
 	}
 	
-	public function resetTradeLogProcessing(){
-		DB::beginTransaction();
-		
-		$trades=Trade::all();
-		foreach ($trades as $trade){
-			$trade->tradeLogs()->detach();
-			$trade->delete();
-		}
-		TradeLog::where('processed',1)->update(['processed'=>false]);
-		
-		DB::commit();
-		
-		Session::flash('success','Tables reseted!');
-		
-	}
-	
 }
