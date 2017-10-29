@@ -17,7 +17,18 @@ class Position extends Model
      * @var array
      */
     protected $fillable = ['counter', 'name'];
-
+	
+	//mutators & acccessors
+	
+	public function generateName(){
+		if(!is_null($this->id )) {
+			$trades=Trade::where('position_id', $this->id)->orderBy('open_date','asc')->get();
+			$this->name=$trades->implode('TradeFullName',', ');
+		}
+	}
+ 
+	//relations
+	
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -25,11 +36,4 @@ class Position extends Model
     {
         return $this->hasMany(Trade::class);
     }
-    
-    public function generateName(){
-    	if(!is_null($this->id )) {
-			$trades=Trade::where('position_id', $this->id)->orderBy('open_date','asc')->get();
-			$this->name=$trades->implode('TradeFullName',', ');
-		}
-	}
 }

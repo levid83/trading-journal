@@ -80,7 +80,17 @@ class TradesController extends Controller
 			$position->save();
 		}
 	}
-	
+	private function removePositions(Array $trades){
+		if (!empty($trades)){
+			foreach ($trades as $id){
+				$trade=Trade::find($id);
+				if (Auth::user()->can('update',$trade)) {
+					$trade->postion_id = null;
+					$trade->save();
+				}
+			}
+		}
+	}
 	private function editTrades(Request $request){
 		if (!empty($request->trade)) {
 			if ($request->has('add_tactic') && isset($request->tactic_id)) {
@@ -96,6 +106,10 @@ class TradesController extends Controller
 			
 			if ($request->has('add_to_position') && isset($request->position_id)) {
 				$this->updatePositions($request->position_id, $request->trade);
+			}
+			
+			if ($request->has('remove_position')) {
+				$this->removePositions($request->trade);
 			}
 		}
 	}
@@ -118,6 +132,7 @@ class TradesController extends Controller
 			->with('position')
 			->with('trader')
 			->userAllowedTrades(Auth::user()) //only the user's trades
+			->filterClient($request->input('filter_client_id'))
 			->filterTrader($request->input('filter_trader_id'))
 			->filterUnderlying($request->input('filter_underlying'))
 			->filterPosition($request->input('filter_position_id'))
@@ -135,15 +150,25 @@ class TradesController extends Controller
 
 		$request->flashExcept(['trade']);
 		
+		$positions=Position::whereHas('trades',
+						function($query) use ($request){
+							$query->filterClient($request->input('filter_client_id'))
+									->filterTrader($request->input('filter_trader_id'))
+									->filterUnderLying($request->input('filter_underlying'));
+						}
+					)->get();
+		
+		
         return view('admin.trades.index')
 			->with('trades',$trades)
-			->with('traders',TradingAccount::where('account_type',TradingAccount::TRADER)->get())
+			->with('traders',TradingAccount::where('account_type',TradingAccount::TRADER)->orderBy('account_name','asc')->get())
+			->with('clients',TradingAccount::where('account_type',TradingAccount::CLIENT)->orderBy('account_name','asc')->get())
 			->with('trade_types',Trade::TRADE_TPYES)
 			->with('asset_classes',Trade::ASSET_CLASSES)
 			->with('trade_actions',Trade::ACTIONS)
 			->with('option_types',Trade::OPTION_TYPES)
-			->with('tactics',Tactic::all())
-			->with('positions',Position::all());
+			->with('tactics',Tactic::where('id','>',0)->orderBy('name','asc')->get())
+			->with('positions',$positions);
     }
 
     /**

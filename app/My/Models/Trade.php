@@ -174,13 +174,27 @@ class Trade extends Model
 	/**
 	 *
 	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $client
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterClient($query, $client){
+		
+		if ($client!=''){
+			$query->where('client_id',$client);
+		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
 	 * @param mixed $trader
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function scopeFilterTrader($query, $trader){
 
 		if ($trader!=''){
-			$query->where('trader_id','like',$trader.'%');
+			$query->where('trader_id',$trader);
 		}
  		return $query;
 	}
@@ -193,7 +207,12 @@ class Trade extends Model
 	public function scopeFilterUnderLying($query, $underlying){
 
 		if ($underlying!=''){
-			$query->where('underlying','like',$underlying.'%');
+			if (str_contains($underlying, ',')){
+				$underlying = preg_replace('/\s+/', ' ', $underlying);
+				$query->whereIn('underlying',explode(',', $underlying));
+			}else {
+				$query->where('underlying', 'like', $underlying);
+			}
 		}
  		return $query;
 	}
