@@ -19,7 +19,7 @@ class Asset extends Model
     /**
      * @var array
      */
-    protected $fillable = ['type', 'name', 'symbol', 'multiplier','price_correction'];
+    protected $fillable = ['type', 'name', 'symbol', 'aliases', 'multiplier','price_correction'];
 
     protected $dates=['created_at','updated_at'];
 
