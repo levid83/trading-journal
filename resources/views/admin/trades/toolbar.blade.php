@@ -12,7 +12,7 @@
         <button  name="add_tactic" type="submit" class="btn btn-info" title="Update the selected trades with the selected tactic">Update tactic</button>
     </li>
     <li>
-        <button  name="remove_tactic" type="submit" class="btn btn-danger" title="Remove the tactics from tge selected trades">Remove tactic</button>
+        <button  name="remove_tactic" type="submit" class="btn btn-danger" title="Remove the tactics from the selected trades">Remove tactic</button>
     </li>
     <li>
         <select name="position_id" id="position_id" class="form-control">
@@ -26,7 +26,10 @@
         <button  name="add_to_position" type="submit" class="btn btn-info" title="Add the selected trades to the selected position">Add to position</button>
     </li>
     <li>
-        <button  name="add_new_position" type="submit" class="btn btn-info" title="Add the selected trades to a new position">Create a new position</button>
+        <button  name="add_new_position" type="submit" class="btn btn-info" title="Add the selected trades to a new position">Add new position</button>
+    </li>
+    <li>
+        <button  name="remove_position" type="submit" class="btn btn-danger" title="Remove the positions from the selected trades">Remove position</button>
     </li>
 </ul>
 </div>

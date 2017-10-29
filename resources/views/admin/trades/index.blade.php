@@ -10,10 +10,10 @@
         <div class="panel panel-default" id="trades_filter_panel">
             <div class="panel-heading">
                 <h5 class="panel-title">
-                    <a data-toggle="collapse" data-target="#trades_filterbar" href="#trades_filterbar" class="collapsed">FilterBar</a>
+                    <a data-toggle="collapse" data-target="#trades_filterbar" href="#trades_filterbar">FilterBar</a>
                 </h5>
             </div>
-            <div id="trades_filterbar" class="panel-collapse collapse">
+            <div id="trades_filterbar" class="panel-collapse collapse in">
                 <div class="panel-body">@include ('admin.trades.filterbar')</div>
             </div>
         </div>
@@ -27,14 +27,14 @@
                 <div class="panel-body">
                     <div class="table-responsive">
                         <div>
-                            <div class="col-md-9">
+                            <div class="col-md-10">
                                 @include ('admin.trades.toolbar')
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page','trade')))->render() !!} </div>
                             </div>
                         </div>
-                        <table class="table-condensed table-borderless">
+                        <table class="table-condensed table-borderless table-striped">
                             <thead>
                             <tr>
                                 <th></th>
@@ -42,6 +42,7 @@
                                 @if(Auth::user()->isSuperAdmin())
                                 <th>Trader</th>
                                 @endif
+                                <th>Client</th>
                                 <th>@sortablelink('underlying','Underlying')</th>
                                 <th>@sortablelink('position_id','Position Id')</th>
                                 <th>@sortablelink('tactic.name','Tactic')</th>
@@ -55,7 +56,7 @@
                                 <th>Bid</th>
                                 <th>Comm. Open</th>
                                 <th>Comm. Close</th>
-                                <th>@sortablelink('profit','Profit')</th>
+                                <th>@sortablelink('profit','P/L')</th>
                                 <th>@sortablelink('open_date','Open Date')</th>
                                 <th>@sortablelink('close_date','Close Date')</th>
                                 <th>@sortablelink('Status')</th>
@@ -76,13 +77,14 @@
                                 @if(Auth::user()->isSuperAdmin())
                                 <td>{{ $item->trader->account_id }}</td>
                                 @endif
+                                <td>{{ $item->client->account_id }}</td>
                                 <td>{{ $item->underlying }}</td>
                                 <td title="@if($item->position){{$item->position->name}}@endif">@if($item->position){{$item->position->id }}@endif</td>
                                 <td>@if($item->tactic){{$item->tactic->name }}@endif</td>
                                 <td>{{ $item->asset_class }}</td>
                                 <td>{{ $item->action }}</td>
                                 <td>{{ $item->quantity }}</td>
-                                <td>{{ date('Y-m-d',strtotime($item->expiration)) }}</td>
+                                <td>{{ $item->formatedExpiration }}</td>
                                 <td>{{ $item->roundedStrike }}</td>
                                 <td>{{ $item->put_call }}</td>
                                 <td>{{ $item->roundedAsk }}</td>

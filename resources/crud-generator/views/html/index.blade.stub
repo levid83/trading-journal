@@ -34,7 +34,7 @@
                                 <div class="pagination-wrapper"> {!! $%%crudName%%->appends(Request::except(array('page')))->render() !!} </div>
                             </div>
                         </div>
-                        <table class="table-condensed table-borderless ">
+                        <table class="table-condensed table-borderless table-striped">
                             <thead>
                             <tr>
                                 <th></th>
