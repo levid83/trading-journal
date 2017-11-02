@@ -95,23 +95,33 @@ class TradesController extends Controller
 		if (!empty($request->trade)) {
 			if ($request->has('add_tactic') && isset($request->tactic_id)) {
 				$this->updateTactics($request->tactic_id, $request->trade);
+				
+				Session::flash('success','Tactic successfully updated.');
 			}
 			if ($request->has('remove_tactic')) {
 				$this->removeTactics($request->trade);
+				
+				Session::flash('success','Tactic successfully removed.');
 			}
 			
 			if ($request->has('add_new_position')) {
 				$this->createNewPosition($request->trade);
+				
+				Session::flash('success','New position successfully created.');
 			}
 			
 			if ($request->has('add_to_position') && isset($request->position_id)) {
 				$this->updatePositions($request->position_id, $request->trade);
+				
+				Session::flash('success','Position successfully updated.');
 			}
 			
 			if ($request->has('remove_position')) {
 				$this->removePositions($request->trade);
+				Session::flash('success','Position successfully removed.');
 			}
 		}
+		
 	}
 	
     /**
@@ -127,7 +137,8 @@ class TradesController extends Controller
 		}else{
     		Session::flash("error","You have no permission to update these trades");
 		}
-
+//dd($request);
+		//DB::enableQueryLog();
 		$trades = Trade::with('tactic')
 			->with('position')
 			->with('trader')
@@ -140,15 +151,17 @@ class TradesController extends Controller
 			->filterStatus($request->input('filter_status'))
 			->filterAssetClass($request->input('filter_asset_class'))
 			->filterAction($request->input('filter_action'))
-			->filterStrike($request->input('filter_strike'))
+			->filterStrike($request->input('filter_strike_from'),$request->input('filter_strike_to'))
 			->filterPutCall($request->input('filter_put_call'))
 			->filterExpiry($request->input('filter_expiration_from'),$request->input('filter_expiration_to'))
 			->filterOpenDate($request->input('filter_open_date_from'),$request->input('filter_open_date_to'))
 			->filterCloseDate($request->input('filter_close_date_from'),$request->input('filter_close_date_to'))
 			->sortable()
 			->simplePaginate(30);
+    	//dd(DB::getQueryLog());
 
 		$request->flashExcept(['trade']);
+		
 		
 		$positions=Position::whereHas('trades',
 						function($query) use ($request){
@@ -156,7 +169,7 @@ class TradesController extends Controller
 									->filterTrader($request->input('filter_trader_id'))
 									->filterUnderLying($request->input('filter_underlying'));
 						}
-					)->get();
+					)->orderBy('id','desc')->get();
 		
 		
         return view('admin.trades.index')

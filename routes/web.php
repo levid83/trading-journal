@@ -17,8 +17,7 @@ Route::get('/', function () {
 
 Route::get('/import/csv/automated-import', 'CsvController@automatedImport')->name('csv.automated-import');
 
-Route::get('/import/csv/process-trade-log', 'CsvController@processTradeLog')->name('csv.process-trade-log');
-Route::get('/import/csv/reset-trade-log', 'CsvController@resetTradeLogProcessing')->name('csv.reset-trade-log');
+
 
 Auth::routes();
 
@@ -28,8 +27,8 @@ Route::group(['prefix' => 'admin', 'middleware'=>['auth']], function () {
 	
 	Voyager::routes();
 	
-	Route::get('/import/csv/bulk-import/create', 'CsvController@create')->name('import.csv.bulk-import.create');
-    Route::post('/import/csv/bulk-import/store', 'CsvController@store')->name('import.csv.bulk-import.store');
-    
+	Route::get('/csv/bulk-import/create', 'CsvController@create')->name('csv.bulk-import.create');
+    Route::post('/csv/bulk-import/store', 'CsvController@store')->name('csv.bulk-import.store');
+
     Route::post('/trades', 'TradesController@index')->name('admin.trades.index');
 });

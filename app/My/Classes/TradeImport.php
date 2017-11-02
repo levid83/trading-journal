@@ -9,11 +9,13 @@
 
 namespace App\My\Classes;
 
+use App\My\Exceptions\TradeImportException;
 use DB;
 use App\My\Models\TradeLog;
 use App\My\Models\Trade;
 use App\My\Contracts\TradeLogProvider;
 use Illuminate\Support\Facades\Auth;
+use Mockery\Exception;
 
 
 class TradeImport
@@ -244,23 +246,35 @@ class TradeImport
 	 */
     public function importTradeLogs(){
         DB::beginTransaction();
-        $this->tradeLogProvider->buildTradeLogs();
-        $trade_logs=$this->tradeLogProvider->getTradeLogs();
-        $this->saveTradeLogs($trade_logs);
-        DB::commit();
+        try {
+			$this->tradeLogProvider->buildTradeLogs();
+			$trade_logs = $this->tradeLogProvider->getTradeLogs();
+			$this->saveTradeLogs($trade_logs);
+			DB::commit();
+			return true;
+		}catch(\Exception $e){
+        	DB::rollback();
+			Log::info($e->getMessage());
+        	throw new TradeImportException('Trade log import error');
+		}
     }
 	
 	public function processTradeLog(){
 		DB::beginTransaction();
-		$tradeLogs=$this->getUnprocessedTradeLogs();
-		if (!empty($tradeLogs)) {
-			foreach ($tradeLogs as $tradeLog) {
-				$this->processTrade($tradeLog);
-
-				TradeLog::where('id',$tradeLog->id)->update(['processed'=>true]);
+		try {
+			$tradeLogs = $this->getUnprocessedTradeLogs();
+			if (!empty($tradeLogs)) {
+				foreach ($tradeLogs as $tradeLog) {
+					$this->processTrade($tradeLog);
+					TradeLog::where('id', $tradeLog->id)->update(['processed' => true]);
+				}
 			}
+			DB::commit();
+			return true;
+		}catch(\Exception $e){
+			DB::rollback();
+			Log::info($e->getMessage());
+			throw new TradeImportException('Trade log processing error.');
 		}
-		
-		DB::commit();
 	}
 }

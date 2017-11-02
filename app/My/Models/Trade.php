@@ -47,7 +47,7 @@ class Trade extends Model
 {
 	use Sortable;
 	
-	const TRADE_TPYES=['CLOSE'=>'CLOSE','OPEN'=>'OPEN'];
+	const TRADE_TPYES=['CLOSED'=>'CLOSED','OPEN'=>'OPEN'];
 	const ASSET_CLASSES=['FOP'=>'FOP','FUT'=>'FUT','OPT'=>'OPT','STK'=>'STK'];
 	const ACTIONS=['BUY'=>'BUY','SELL'=>'SELL'];
 	const OPTION_TYPES=['CALL'=>'CALL','PUT'=>'PUT'];
@@ -224,9 +224,12 @@ class Trade extends Model
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
 	public function scopeFilterPosition($query, $position){
-		
-		if ($position!=''){
-			$query->where('position_id',$position);
+		if ($position!='') {
+			if ($position == '0') {
+				$query->whereNull('position_id');
+			} else {
+				$query->where('position_id', $position);
+			}
 		}
 		return $query;
 	}
@@ -240,7 +243,11 @@ class Trade extends Model
 	public function scopeFilterTactic($query, $tactic){
 		
 		if ($tactic!=''){
-			$query->where('tactic_id',$tactic);
+			if ($tactic=='0') {
+				$query->whereNull('tactic_id');
+			}else{
+				$query->where('tactic_id', $tactic);
+			}
 		}
 		return $query;
 	}
@@ -290,13 +297,17 @@ class Trade extends Model
 	/**
 	 *
 	 * @param \Illuminate\Database\Eloquent\Builder $query
-	 * @param mixed $strike
+	 * @param mixed $strike_from
+	 * @param mixed $strike_to
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function scopeFilterStrike($query, $strike){
+	public function scopeFilterStrike($query, $strike_from, $strike_to ){
 		
-		if ($strike!=''){
-			$query->where('strike',$strike);
+		if ($strike_from!=''){
+			$query->where('strike','>=',$strike_from);
+		}
+		if ($strike_to!=''){
+			$query->where('strike','<=',$strike_to);
 		}
 		return $query;
 	}
