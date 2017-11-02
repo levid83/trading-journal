@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="page-content browse container-fluid">
-    <form method="post" action="{{ url('/%%routeGroup%%%%viewName%%') }}" accept-charset="UTF-8" class="form-horizontal">
+    <form method="post" action="{{ url('/%%routeGroup%%%%viewName%%') }}" accept-charset="UTF-8">
         {{ csrf_field() }}
         {{ method_field('POST') }}
     <div class="panel-group" id="accordion">

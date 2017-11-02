@@ -1,16 +1,69 @@
-@extends('voyager::master')
-
+@extends('admin.layouts.index')
 
 @section('content')
+    @include('admin.includes.styles')
+
+    <style>
+        @media only screen and (max-width: 1000px) {
+
+            /* Force table to not be like tables anymore */
+            #responsive-grid table,
+            #responsive-grid thead,
+            #responsive-grid tbody,
+            #responsive-grid th,
+            #responsive-grid td,
+            #responsive-grid tr {
+                display: block;
+            }
+
+            /* Hide table headers (but not display: none;, for accessibility) */
+            #responsive-grid thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            #responsive-grid tr { border: 1px solid #ccc; }
+
+            #responsive-grid td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                white-space: normal;
+                text-align:left;
+            }
+
+            #responsive-grid td:before {
+                /* Now like a table header */
+                position: absolute;
+                /* Top/left values mimic padding */
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align:left;
+                font-weight: bold;
+            }
+
+            /*
+            Label the data
+            */
+            #responsive-grid td:before { content: attr(data-title); }
+        }
+    </style>
+
 <div class="page-content browse container-fluid">
-    <form method="post" action="{{ url('/admin/trades') }}" accept-charset="UTF-8" class="form-horizontal">
+    <form method="post" action="" accept-charset="UTF-8">
         {{ csrf_field() }}
         {{ method_field('POST') }}
     <div class="panel-group" id="accordion">
         <div class="panel panel-default" id="trades_filter_panel">
             <div class="panel-heading">
                 <h5 class="panel-title">
-                    <a data-toggle="collapse" data-target="#trades_filterbar" href="#trades_filterbar">FilterBar</a>
+                    <a data-toggle="collapse" data-target="#trades_filterbar" href="#trades_filterbar">Filters</a>
                 </h5>
             </div>
             <div id="trades_filterbar" class="panel-collapse collapse in">
@@ -25,42 +78,41 @@
             </div>
             <div id="trades_list" class="panel-collapse collapse in">
                 <div class="panel-body">
-                    <div class="table-responsive">
-                        <div>
-                            <div class="col-md-10">
+
+                    <div class="table table-responsive">
+                            <div class="col-sm-12 col-md-10 col-lg-10">
                                 @include ('admin.trades.toolbar')
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-sm-12 col-md-2 col-lg-2">
                                 <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page','trade')))->render() !!} </div>
                             </div>
-                        </div>
-                        <table class="table-condensed table-borderless table-striped">
+                          <table class="table-bordered table-striped table-condensed small" id="responsive-grid">
                             <thead>
                             <tr>
                                 <th></th>
-                                <th>@sortablelink('id')</th>
+                                <th class="text-nowrap">@sortablelink('id')</th>
                                 @if(Auth::user()->isSuperAdmin())
-                                <th>Trader</th>
+                                <th class="text-nowrap">@sortablelink('trader.name','Trader')</th>
                                 @endif
-                                <th>Client</th>
-                                <th>@sortablelink('underlying','Underlying')</th>
-                                <th>@sortablelink('position_id','Position Id')</th>
-                                <th>@sortablelink('tactic.name','Tactic')</th>
-                                <th>@sortablelink('asset_class','Asset Class')</th>
-                                <th>@sortablelink('action','Action')</th>
-                                <th>Quantity</th>
-                                <th>@sortablelink('expiration','Expiry')</th>
-                                <th>@sortablelink('strike','Strike')</th>
-                                <th>@sortablelink('put_call','Put Call')</th>
-                                <th>Ask</th>
-                                <th>Bid</th>
-                                <th>Comm. Open</th>
-                                <th>Comm. Close</th>
-                                <th>@sortablelink('profit','P/L')</th>
-                                <th>@sortablelink('open_date','Open Date')</th>
-                                <th>@sortablelink('close_date','Close Date')</th>
-                                <th>@sortablelink('Status')</th>
-                                <th>Actions</th>
+                                <th class="text-nowrap">@sortablelink('client.name','Client')</th>
+                                <th class="text-nowrap">@sortablelink('underlying','Asset')</th>
+                                <th class="text-nowrap">@sortablelink('position_id','Position')</th>
+                                <th class="text-nowrap">@sortablelink('tactic.name','Tactic')</th>
+                                <th class="text-nowrap">@sortablelink('asset_class','Class')</th>
+                                <th class="text-nowrap">@sortablelink('action','Action')</th>
+                                <th class="text-nowrap">@sortablelink('quantity','Qty.')</th>
+                                <th class="text-nowrap">@sortablelink('expiration','Expiry')</th>
+                                <th class="text-nowrap">@sortablelink('strike','Strike')</th>
+                                <th class="text-nowrap">@sortablelink('put_call','P/C')</th>
+                                <th class="text-nowrap">@sortablelink('ask','Ask')</th>
+                                <th class="text-nowrap">@sortablelink('bid','Bid')</th>
+                                <th>Open Comm.</th>
+                                <th>Close Comm.</th>
+                                <th class="text-nowrap">@sortablelink('profit','P/L')</th>
+                                <th class="text-nowrap">@sortablelink('open_date','Opened')</th>
+                                <th class="text-nowrap">@sortablelink('close_date','Closed')</th>
+                                <th class="text-nowrap">@sortablelink('status','Status')</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -69,34 +121,34 @@
                                 <td>
                                     <div class="checkbox">
                                         <label>
-                                            <input name="trade[{{$item->id}}]" type="checkbox" value="{{$item->id}}">
+                                            <input name="trade[{{$item->id}}]" id="trade_{{$item->id}}" type="checkbox" value="{{$item->id}}">
                                         </label>
                                     </div>
                                 </td>
-                                <td>{{ $item->id }}</td>
+                                <td data-title="Id">{{ $item->id }}</td>
                                 @if(Auth::user()->isSuperAdmin())
-                                <td>{{ $item->trader->account_id }}</td>
+                                <td data-title="Trader">{{ $item->trader->account_id }}</td>
                                 @endif
-                                <td>{{ $item->client->account_id }}</td>
-                                <td>{{ $item->underlying }}</td>
-                                <td title="@if($item->position){{$item->position->name}}@endif">@if($item->position){{$item->position->id }}@endif</td>
-                                <td>@if($item->tactic){{$item->tactic->name }}@endif</td>
-                                <td>{{ $item->asset_class }}</td>
-                                <td>{{ $item->action }}</td>
-                                <td>{{ $item->quantity }}</td>
-                                <td>{{ $item->formatedExpiration }}</td>
-                                <td>{{ $item->roundedStrike }}</td>
-                                <td>{{ $item->put_call }}</td>
-                                <td>{{ $item->roundedAsk }}</td>
-                                <td>{{ $item->roundedBid }}</td>
-                                <td>{{ $item->commission_open }}</td>
-                                <td>{{ $item->commission_close }}</td>
-                                <td>{{ $item->roundedProfit }}</td>
-                                <td>{{ $item->open_date }}</td>
-                                <td>{{ $item->close_date }}</td>
-                                <td>{{ $item->status }}</td>
+                                <td data-title="Client">{{ $item->client->account_id }}</td>
+                                <td data-title="Asset">{{ $item->underlying }}</td>
+                                <td data-title="Position" title="@if($item->position){{$item->position->name}}@endif">@if($item->position){{$item->position->id }}@endif</td>
+                                <td data-title="Tactic">@if($item->tactic){{$item->tactic->name }}@endif</td>
+                                <td data-title="Class">{{ $item->asset_class }}</td>
+                                <td data-title="Action">{{ $item->action }}</td>
+                                <td data-title="Qty.">{{ $item->quantity }}</td>
+                                <td data-title="Expiry">{{ $item->formatedExpiration }}</td>
+                                <td data-title="Strike">{{ $item->roundedStrike }}</td>
+                                <td data-title="P/C">{{ $item->put_call }}</td>
+                                <td data-title="Ask">{{ $item->roundedAsk }}</td>
+                                <td data-title="Bid">{{ $item->roundedBid }}</td>
+                                <td data-title="Open Comm.">{{ $item->commission_open }}</td>
+                                <td data-title="Close Comm.">{{ $item->commission_close }}</td>
+                                <td data-title="P/L">{{ $item->roundedProfit }}</td>
+                                <td data-title="Opened">{{ $item->open_date }}</td>
+                                <td data-title="Closed">{{ $item->close_date }}</td>
+                                <td data-title="Status">{{ $item->status }}</td>
                                 <td>
-                                   <a href="{{ url('/admin/trades/' . $item->id . '/edit') }}" title="Edit trade"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
+                                   <a href="{{ url('/admin/trades/' . $item->id . '/edit') }}" title="Edit trade"><button class="btn btn-primary btn-sm"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
                                 </td>
                             </tr>
                             @endforeach
@@ -104,6 +156,7 @@
                         </table>
                         <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page','trade')))->render() !!} </div>
                     </div>
+
                 </div>
             </div>
         </div>
