@@ -7,7 +7,18 @@
 
 require('./bootstrap');
 
-window.Vue = require('vue');
+let Vue = null;
+window.Vue = null;
+
+Vue = require('vue');
+
+Vue.config.debug = true
+Vue.config.devtools = true
+
+import router from './admin/router/index.js'
+import store from './admin/store/trade.js'
+
+import TradesPage from './admin/pages/TradesPage.vue'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -15,8 +26,11 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('example', require('./components/Example.vue'));
-
 const app = new Vue({
-    el: '#app'
+  el: '#app',
+  router,
+  store,
+  components: {
+    'trades-page': TradesPage
+  }
 });

@@ -16,6 +16,9 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="{{ voyager_asset('css/app.css') }}">
 
+    <link rel="stylesheet" href="{{ asset('css/toastr.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/admin.css') }}">
+
 @yield('css')
 
 <!-- Few Dynamic Styles -->
@@ -60,7 +63,7 @@ if ((substr(Auth::user()->avatar, 0, 7) == 'http://') || (substr(Auth::user()->a
 }
 ?>
 
-<div class="app-container">
+<div class="app-container" >
     <div class="fadetoblack visible-xs"></div>
     <div class="row content-container">
         @include('voyager::dashboard.navbar')
@@ -92,13 +95,12 @@ if ((substr(Auth::user()->avatar, 0, 7) == 'http://') || (substr(Auth::user()->a
             })();
         </script>
         <!-- Main Content -->
-        <div class="container-fluid">
+
+        <div class="container-fluid" id="app">
             <div class="side-body padding-top">
                 @yield('page_header')
                 <div id="voyager-notifications"></div>
-                <div id="app">
-                    @yield('content')
-                </div>
+                @yield('content')
             </div>
         </div>
     </div>
@@ -131,6 +133,7 @@ if ((substr(Auth::user()->avatar, 0, 7) == 'http://') || (substr(Auth::user()->a
 </script>
 @yield('javascript')
 
+<script src="{{ asset('js/app.js') }}"></script>
 <script src="{{ asset('js/toastr.min.js') }}"></script>
 <script>
     @if(Session::has('success'))
