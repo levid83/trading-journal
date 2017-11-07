@@ -131,7 +131,7 @@ class TradesController extends Controller
      */
     public function index(Request $request)
     {
-    
+
     	if(Voyager::can('edit_trades')){
     		$this->editTrades($request);
 		}else{
@@ -142,6 +142,7 @@ class TradesController extends Controller
 		$trades = Trade::with('tactic')
 			->with('position')
 			->with('trader')
+			->with('client')
 			->userAllowedTrades(Auth::user()) //only the user's trades
 			->filterClient($request->input('filter_client_id'))
 			->filterTrader($request->input('filter_trader_id'))
@@ -170,18 +171,23 @@ class TradesController extends Controller
 									->filterUnderLying($request->input('filter_underlying'));
 						}
 					)->orderBy('id','desc')->get();
-		
-		
-        return view('admin.trades.index')
-			->with('trades',$trades)
-			->with('traders',TradingAccount::where('account_type',TradingAccount::TRADER)->orderBy('account_name','asc')->get())
-			->with('clients',TradingAccount::where('account_type',TradingAccount::CLIENT)->orderBy('account_name','asc')->get())
-			->with('trade_types',Trade::TRADE_TPYES)
-			->with('asset_classes',Trade::ASSET_CLASSES)
-			->with('trade_actions',Trade::ACTIONS)
-			->with('option_types',Trade::OPTION_TYPES)
-			->with('tactics',Tactic::where('id','>',0)->orderBy('name','asc')->get())
-			->with('positions',$positions);
+	
+		if($request->ajax()){
+			return response()->json($trades);
+		}else {
+			//return response()->json($trades);
+			
+			return view('admin.trades.index')
+				->with('trades', $trades)
+				->with('traders', TradingAccount::where('account_type', TradingAccount::TRADER)->orderBy('account_name', 'asc')->get())
+				->with('clients', TradingAccount::where('account_type', TradingAccount::CLIENT)->orderBy('account_name', 'asc')->get())
+				->with('trade_types', Trade::TRADE_TPYES)
+				->with('asset_classes', Trade::ASSET_CLASSES)
+				->with('trade_actions', Trade::ACTIONS)
+				->with('option_types', Trade::OPTION_TYPES)
+				->with('tactics', Tactic::where('id', '>', 0)->orderBy('name', 'asc')->get())
+				->with('positions', $positions);
+		}
     }
 
     /**
