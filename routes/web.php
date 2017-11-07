@@ -31,4 +31,8 @@ Route::group(['prefix' => 'admin', 'middleware'=>['auth']], function () {
     Route::post('/csv/bulk-import/store', 'CsvController@store')->name('csv.bulk-import.store');
 
     Route::post('/trades', 'TradesController@index')->name('admin.trades.index');
+    
+	Route::get('/tactics', 'TacticsController@index')->name('admin.tactics.index');
+	
+	Route::get('/positions', 'PositionsController@index')->name('admin.positions.index');
 });
