@@ -69,19 +69,51 @@ class Trade extends Model
     public $sortable=['id','underlying','asset_class','action','expiration','strike','put_call','profit','open_date','close_date','status'];
 		
 	//mutators
+	
+	public function getTraderNameAttribute(){
+		return !is_null($this->trader_id)?$this->trader()->account_name:null;
+	}
+	
+	public function getPositionNameAttribute(){
+		return !is_null($this->position_id)?$this->position()->name:null;
+	}
+	
+	public function getAskAttribute($ask){
+		return !is_null($ask)?round($ask,2):null;
+	}
+	
     public function getRoundedAskAttribute(){
     	return (!is_null($this->ask)?round($this->ask,2):null);
 	}
+	
+	public function getBidAttribute($bid){
+		return  !is_null($bid)?round($bid,2):$bid;
+	}
+	
 	public function getRoundedBidAttribute(){
 		return (!is_null($this->bid)?round($this->bid,2):null);
 	}
+	
+	public function getStrikeAttribute($strike){
+		return (!is_null($strike)?round($strike,2):null);
+	}
+	
 	public function getRoundedStrikeAttribute(){
 		return (!is_null($this->strike)?round($this->strike,2):null);
+	}
+	
+	public function getProfitAttribute($profit){
+		return (!is_null($profit)?round($profit,2):null);
 	}
 	
 	public function getRoundedProfitAttribute(){
 		return (!is_null($this->profit)?round($this->profit,2):null);
 	}
+	
+	public function getExpirationAttribute($expiration){
+		return (!is_null($expiration)?date("Md'y",strtotime($expiration)):null);
+	}
+	
 	public function getFormatedExpirationAttribute(){
     	return (!is_null($this->expiration)?date("Md'y",strtotime($this->expiration)):null);
 	}
