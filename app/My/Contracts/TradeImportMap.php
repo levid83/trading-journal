@@ -11,20 +11,6 @@ interface TradeImportMap
 {
 	
 	/**
-	 * @param $accountId
-	 *
-	 * @return mixed
-	 */
-    public function setAccountId($accountId);
-	
-	/**
-	 * @param $tradeLogEntityId
-	 *
-	 * @return mixed
-	 */
-    public function setTradeLogEntityId($tradeLogEntityId);
-	
-	/**
 	 * @param $data
 	 *
 	 * @return mixed

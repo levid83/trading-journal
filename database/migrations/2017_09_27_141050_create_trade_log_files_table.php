@@ -15,12 +15,12 @@ class CreateTradeLogFilesTable extends Migration {
 		Schema::create('trade_log_files', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('trading_account_id')->unsigned()->index();
+			$table->integer('client_id')->unsigned()->index();
 			$table->string('file_name', 191)->index();
 			$table->dateTime('last_modification')->index();
 			$table->timestamps();
 			
-			$table->foreign('trading_account_id', 'FK_trade_log_files_trading_account_id')->references('id')->on('trading_accounts')->onUpdate('RESTRICT')->onDelete('RESTRICT');
+			$table->foreign('client_id', 'FK_trade_log_files_client_id')->references('id')->on('trading_accounts')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 			
 		});
 	}

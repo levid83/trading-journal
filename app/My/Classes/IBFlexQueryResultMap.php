@@ -22,9 +22,6 @@ class IBFlexQueryResultMap implements TradeImportMap
 {
 
     const MAP=[
-        'trader_id' => null,
-        'trade_log_file_id' =>null,
-        'client_id'=>null,
         'account' => 'clientaccountid',/* ClientAccountID */
         'execution_id' => 'ibexecid',/* IBExecID - IB unique execution id */
         'underlying' => 'underlyingsymbol', /* UnderlyingSymbol */
@@ -52,9 +49,7 @@ class IBFlexQueryResultMap implements TradeImportMap
         'order_type' => 'ordertype',/* OrderType  */
 		'json'=>null,
     ];
-
-    private $accountId;
-    private $tradeLogEntityId;
+	
     private $data;
     private $map;
 	
@@ -70,11 +65,11 @@ class IBFlexQueryResultMap implements TradeImportMap
 	 *
 	 * @return bool
 	 */
-    private function isHeader($row){
-        if ($row['clientaccountid']!='ClientAccountID'){
-            return false;
-        }else{
+    private function isDataRow($row){
+        if ($row['header']=='DATA'){
             return true;
+        }else{
+            return false;
         }
     }
 	
@@ -192,38 +187,6 @@ class IBFlexQueryResultMap implements TradeImportMap
 
         return $row['time'];
     }
-    
-	private function setClientId($row){
-		$account=TradingAccount::where('account_id',$row['clientaccountid'])->orWhere('account_name',$row['clientaccountid'])->first();
-		if (!$account){
-			$account=TradingAccount::create(['account_id'=>$row['clientaccountid'],
-											 'account_name'=> $row['clientaccountid'],
-											 'account_type'=> 'client',
-											]);
-		}
-		$row['client_id'] = $account->id;
-		return $row['client_id'];
-	}
-	
-	/**
-	 * @param $accountId
-	 *
-	 * @return $this
-	 */
-    public function setAccountId($accountId){
-        $this->accountId=$accountId;
-        return $this;
-    }
-	
-	/**
-	 * @param $tradeLogEntityId
-	 *
-	 * @return $this
-	 */
-    public function setTradeLogEntityId($tradeLogEntityId){
-        $this->tradeLogEntityId=$tradeLogEntityId;
-        return $this;
-    }
 	
 	/**
 	 * @param $data
@@ -249,16 +212,13 @@ class IBFlexQueryResultMap implements TradeImportMap
         $this->map=array();
         if (!empty($this->data)) {
             foreach ($this->data as $row) {
-                if(!$this->isHeader($row)) {
+                if($this->isDataRow($row)) {
                     $aux = [];
                     foreach (self::MAP as $key => $item) {
                         if (isset($row[$item])) {
                             $aux[$key] = $row[$item];
                         }
                     }
-					$aux['client_id']=$this->setClientId($row);
-                    $aux['trader_id'] = $this->accountId;
-                    $aux['trade_log_file_id'] = $this->tradeLogEntityId;
 					//!!! fix the $row not $aux
 					$row['underlyingsymbol'] = $this->fixUnderlyingSymbol($row);
 					

@@ -8,8 +8,12 @@
 
 namespace App\My\Classes;
 
+use App\My\Models\Trade;
+use Carbon\Carbon;
 use Excel;
 use DB;
+use Mockery\Exception;
+use PhpParser\Node\Expr\Array_;
 use Storage;
 use File;
 
@@ -58,34 +62,7 @@ class IBTradeLogFile implements TradeLogProvider
     private function uploadFile(){
         Storage::disk('local')->put($this->getFilePath(),  File::get($this->file));
     }
-	
-	/**
-	 * @param int $account_id
-	 * @param     $file
-	 * @param     $last_modified
-	 *
-	 * @return mixed
-	 */
-    private function saveImportFileMeta($account_id=0,$file,$last_modified){
 
-        $tradeLogFile=TradeLogFile::where('trading_account_id',$account_id)->where('file_name',$file)->get();
-
-        if ($tradeLogFile->count()>0){
-            $file_id=$tradeLogFile->first()->id;
-            TradeLogFile::where('trading_account_id',$account_id)->where('file_name',$file)
-                ->update(['last_modification'=>$last_modified]);
-        }else {
-            $tradeLogFile = TradeLogFile::create([
-                'trading_account_id' => $account_id,
-                'file_name' => $file,
-                'last_modification' => $last_modified
-            ]);
-
-            $file_id=$tradeLogFile->id;
-        }
-        return $file_id;
-    }
-	
 	/**
 	 * @param array $params
 	 *
@@ -93,10 +70,8 @@ class IBTradeLogFile implements TradeLogProvider
 	 */
     private function mapTradeLog($params=[]){
         if (isset($params['data']) && !empty($params['data'])){
-            $this->mapper->setData($params['data'])
-                ->setAccountId($params['account_id'])
-                ->setTradeLogEntityId($params['trade_log_file_id']);
-
+            $this->mapper->setData($params['data']);
+            
             $this->mapper->map();
 
             return $this->mapper->getMap();
@@ -138,13 +113,110 @@ class IBTradeLogFile implements TradeLogProvider
 	 *
 	 * @return bool|string
 	 */
-    private function getAccountId($directory=''){
-        if($this->getMethod()==self::MANUAL) {
-            return substr($this->file->getClientOriginalName(), 0, strpos($this->file->getClientOriginalName(), '_'));
-        }else{
-            return str_replace_first('csv/automated/'.TradeImport::BROKER_DIRECTORIES[$this->broker], '', $directory);
-        }
+    private function getAccountIdFromDirectoryName($directory=''){
+		return str_replace_first('csv/automated/'.TradeImport::BROKER_DIRECTORIES[$this->broker], '', $directory);
     }
+    
+    private function addTraderIfNotExists($trader_id=null){
+		$account = TradingAccount::where('account_id',$trader_id)->first();
+		if (!$account) 	$account=TradingAccount::create(['account_id'=>$trader_id,
+											 'account_name'=> $trader_id,
+											 'account_type'=> 'trader',
+											]);
+		return $account;
+	}
+	
+	/**
+	 * get the client id based on trade log "account" column
+	 *
+	 * @param $client_account
+	 *
+	 * @return int|mixed
+	 */
+	private function getClientIdByAccount($client_account){
+		
+		return TradingAccount::where('account_id', $client_account)
+			->orWhere('account_name',$client_account)->first()->id;
+	}
+	
+    private function getTradeLogMetaInfoFromCsv($filename, $delimiter=",", $enclosure='"', $escape="\\"){
+    	$metainfo=[];
+		if (($handle = fopen(storage_path('app/' . $filename), "r"))!==false){
+			$data = fgetcsv($handle, 1000, $delimiter, $enclosure, $escape);
+			if ($data[0]!='BOF'){
+				throw new TradeImportException('Missing BOF from the beginning of the file');
+			}
+			if (!empty($data[1])){
+				$metainfo['trader_id']=$data[1];
+			}else{
+				throw  new TradeImportException('Trader Account Id is missing! ');
+			}
+			try{
+				Carbon::createFromFormat('Y-m-d', $data[4]);
+				$metainfo['start_date']=$data[4];
+			}catch(\Exception $e){
+				throw  new TradeImportException('Start date is missing or invalid!');
+			}
+			try{
+				Carbon::createFromFormat('Y-m-d', $data[5]);
+				$metainfo['end_date']=$data[5];
+			}catch(\Exception $e){
+				throw  new TradeImportException('End date is missing or invalid!');
+			}
+		}else{
+			throw  new TradeImportException('File is empty! ');
+		}
+			
+		return $metainfo;
+		
+	}
+	
+	/**
+	 * saves the trade log file meta info into database
+	 *
+	 * @param $file
+	 * @param $client_id
+	 * @param $meta
+	 *
+	 * @return int|mixed
+	 */
+	private function saveTradeLogFileMeta($file ,$client_id, $meta){
+		$last_modified=self::getFileLastModificationDate($this->getFilePath());
+		$objTradeLogFile = TradeLogFile::where('file_name', $file)
+			->where('client_id',$client_id)
+			->where('last_modification', '>=', $last_modified)->first();
+		
+		if ($objTradeLogFile){
+			$objTradeLogFile->last_modification=$last_modified;
+			$objTradeLogFile->save();
+		}else {
+			$objTradeLogFile = TradeLogFile::create([
+														'client_id' => $client_id,
+														'file_name' => $file,
+														'last_modification' => $last_modified
+													]);
+		}
+		
+		return $objTradeLogFile->id;
+	}
+	
+	/**
+	 * checks the last update against the start date to avoid gaps in the logs
+	 * @return bool
+	 */
+	private function hasDisruptionInTradeLog($client_id,$start_date){
+		/**
+		 * @todo remove when finalized
+		 */
+		return false;
+		
+		$previous_trade_log_exists=TradeLogFile::where('client_id',$client_id)->exists();
+		if ($previous_trade_log_exists)
+			return !TradeLogFile::where('client_id',$client_id)->where('end_date','>=',$start_date)->exist();
+		else {
+			return false;
+		}
+	}
 	
 	/**
 	 * @return string
@@ -177,6 +249,7 @@ class IBTradeLogFile implements TradeLogProvider
     static public function fileExists($filename){
         return Storage::disk('local')->exists($filename);
     }
+    
 	
 	/**
 	 * @param $filename
@@ -184,21 +257,45 @@ class IBTradeLogFile implements TradeLogProvider
 	 *
 	 * @return array|bool
 	 */
-    public function parseFile($filename,$accountId){
-        $last_modified=self::getFileLastModificationDate($filename);
-        //check if file already exists in the db and it's date
-        $db_file = TradeLogFile::where('file_name', $filename)->where('last_modification', '>=', $last_modified)->get();
-        if ($db_file->count() == 0) {
-            $trade_log_file_id = $this->saveImportFileMeta($accountId, $filename, $last_modified);
-            $data = Excel::load(storage_path('app/' . $filename), function ($reader) {})->get();
-            return $this->mapTradeLog(['data'=>$data,'account_id'=>$accountId,'trade_log_file_id'=>$trade_log_file_id]);
-        }else {
-            $this->saveImportFileMeta($accountId, $filename, $last_modified);
-            return [];
-        }
-
+    public function parseCsvFile($filename){
+		return $this->mapTradeLog(['data'=>Excel::load(storage_path('app/' . $filename))->get()]);
     }
 	
+	public function postProcessingTradeLog($logs,$meta){
+  		//creates and/or get the trader id
+		$trader_id=$this->addTraderIfNotExists($meta['trader_id'])->id;
+		
+		//creates a collection from array and group them by client account
+		$logs=collect($logs);
+		$groups=$logs->groupBy('account');
+		
+		$groups->transform(
+			//set the client id, trader id for each group
+			function($logs, $client_account) use ($trader_id,$meta){
+				
+				$client_id=$this->getClientIdByAccount($client_account);
+				
+				if (!$this->hasDisruptionInTradeLog($client_id,$meta['start_date'])) {
+					$trade_log_file_id = $this->saveTradeLogFileMeta($this->getFilePath(), $client_id,$meta);
+					
+					$logs->transform(
+						//set the client id, trader id, log file id for each trade log item
+						function($log,$idx) use ($trader_id,$client_id,$trade_log_file_id){
+							$log['client_id']=$client_id;
+							$log['trader_id']=$trader_id;
+							$log['trade_log_file_id']=$trade_log_file_id;
+							return $log;
+						}
+					);
+					return $logs;
+				}else{
+					throw new TradeImportException(' Disruption in trade log.');
+				}
+			}
+		);
+		return $groups->flatten(1);
+	}
+    
 	/**
 	 *
 	 */
@@ -206,17 +303,14 @@ class IBTradeLogFile implements TradeLogProvider
         if($this->getMethod()==self::MANUAL){
             $this->uploadFile();
             if (self::fileExists($this->getFilePath())){
-                $account = TradingAccount::where('account_id', $this->getAccountId())->first();
-                if (!$account) { //if trading doesn't exist
-					$account=TradingAccount::create(['account_id'=>$this->getAccountId(),
-													 'account_name'=> $this->getAccountId(),
-													 'account_type'=> 'trader',
-													]);
-                }
-                $this->tradeLogs=$this->parseFile($this->getFilePath(), $account->id);
-
+          		$meta_info = $this->getTradeLogMetaInfoFromCsv($this->getFilePath());
+								
+				config(['excel.import.startRow'=>'4']);
+				$result=$this->parseCsvFile($this->getFilePath());
+				$this->tradeLogs=$this->postProcessingTradeLog($result,$meta_info);
+				
             }else{
-                throw new FileException("File '.$this->getFilePath().' account doesn't exist!");
+                throw new FileException("File '.$this->getFilePath().' doesn't exist!");
             }
         }
         if($this->getMethod()==self::AUTOMATED){
@@ -224,16 +318,12 @@ class IBTradeLogFile implements TradeLogProvider
             if (!empty($directories)) {
                 foreach ($directories as $directory) {
                     $files = Storage::disk('local')->files($directory);
-                    $account = TradingAccount::where('account_id', $this->getAccountId($directory))->first();
-                    if (!$account) { //if trading doesn't exist
-						$account=TradingAccount::create(['account_id'=>$this->getAccountId($directory),
-														 'account_name'=> $this->getAccountId($directory),
-														 'account_type'=> 'trader',
-														]);
-                    }
+					$account=$this->getAccountIdFromDirectoryName($directory);
 					if (!empty($files)) {
 						foreach ($files as $file) {
-							$result=$this->parseFile($file,$account->id);
+							
+							$result=$this->parseCsvFile($this->getFilePath());
+							$result=$this->postProcessingTradeLog($result,['trader_id'=>$account]);
 							$this->tradeLogs=array_merge($this->tradeLogs,$result);
 						}
 					}

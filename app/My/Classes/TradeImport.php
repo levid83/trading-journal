@@ -16,6 +16,7 @@ use App\My\Models\Trade;
 use App\My\Contracts\TradeLogProvider;
 use Illuminate\Support\Facades\Auth;
 use Mockery\Exception;
+use Illuminate\Support\Facades\Log;
 
 
 class TradeImport
@@ -255,7 +256,7 @@ class TradeImport
 		}catch(\Exception $e){
         	DB::rollback();
 			Log::info($e->getMessage());
-        	throw new TradeImportException('Trade log import error');
+        	throw new TradeImportException('Trade log import error: '.$e->getMessage());
 		}
     }
 	
@@ -274,7 +275,7 @@ class TradeImport
 		}catch(\Exception $e){
 			DB::rollback();
 			Log::info($e->getMessage());
-			throw new TradeImportException('Trade log processing error.');
+			throw new TradeImportException('Trade log processing error: '.$e->getMessage());
 		}
 	}
 }
