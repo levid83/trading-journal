@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Asset;
+use App\My\Models\Asset;
 
 class AssetsTableSeeder extends Seeder
 {

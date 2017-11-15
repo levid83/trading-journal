@@ -15,11 +15,14 @@ class CreateTradingAccountsTable extends Migration {
 		Schema::create('trading_accounts', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->char('account_id', 50);
-			$table->char('account_name', 50);
+			$table->integer('user_id')->nullable()->unsigned()->index();
+			$table->char('account_id', 50)->index();
+			$table->char('account_name', 50)->index();
 			$table->char('account_type', 50);
 			$table->softDeletes();
 			$table->timestamps();
+			
+			$table->foreign('user_id', 'FK_trading_accounts_user_id')->references('id')->on('users')->onUpdate('RESTRICT')->onDelete('RESTRICT');
 		});
 	}
 

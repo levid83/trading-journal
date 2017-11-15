@@ -15,7 +15,7 @@ class CreateStrategiesTable extends Migration {
 		Schema::create('strategies', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('name', 50)->nullable();
+			$table->string('name', 50)->nullable()->index();
 			$table->text('description', 65535)->nullable();
 		});
 	}
