@@ -1,4 +1,4 @@
-@extends('voyager::master')
+@extends('admin.layouts.index')
 
 @section('content')
     @include('admin.includes.errors')
