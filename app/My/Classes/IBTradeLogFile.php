@@ -142,7 +142,10 @@ class IBTradeLogFile implements TradeLogProvider
     private function getTradeLogMetaInfoFromCsv($filename, $delimiter=",", $enclosure='"', $escape="\\"){
     	$metainfo=[];
 		if (($handle = fopen(storage_path('app/' . $filename), "r"))!==false){
+			//get only the first row with meta info
 			$data = fgetcsv($handle, 1000, $delimiter, $enclosure, $escape);
+			fclose($handle);
+			
 			if ($data[0]!='BOF'){
 				throw new TradeImportException('Missing BOF from the beginning of the file');
 			}
@@ -163,6 +166,7 @@ class IBTradeLogFile implements TradeLogProvider
 			}catch(\Exception $e){
 				throw  new TradeImportException('End date is missing or invalid!');
 			}
+			
 		}else{
 			throw  new TradeImportException('File is empty! ');
 		}
