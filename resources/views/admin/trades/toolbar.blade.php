@@ -19,6 +19,7 @@
                 @endforeach
             </select>
             <button  name="add_new_position" type="submit" class="btn btn-info btn-sm" title="Add the selected trades to a new position">Add new position</button>
+            <button  name="add_to_position" type="submit" class="btn btn-info btn-sm" title="Update the selected trades with the selected position">Update position</button>
             <button  name="remove_position" type="submit" class="btn btn-danger btn-sm" title="Remove the positions from the selected trades">Remove position</button>
         </div>
     </div>

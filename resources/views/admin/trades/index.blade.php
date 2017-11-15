@@ -136,7 +136,7 @@
                                 <td data-title="Class">{{ $item->asset_class }}</td>
                                 <td data-title="Action">{{ $item->action }}</td>
                                 <td data-title="Qty.">{{ $item->quantity }}</td>
-                                <td data-title="Expiry">{{ $item->formatedExpiration }}</td>
+                                <td data-title="Expiry">{{ $item->expiration }}</td>
                                 <td data-title="Strike">{{ $item->roundedStrike }}</td>
                                 <td data-title="P/C">{{ $item->put_call }}</td>
                                 <td data-title="Ask">{{ $item->roundedAsk }}</td>

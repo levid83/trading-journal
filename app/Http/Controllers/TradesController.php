@@ -85,7 +85,7 @@ class TradesController extends Controller
 			foreach ($trades as $id){
 				$trade=Trade::find($id);
 				if (Auth::user()->can('update',$trade)) {
-					$trade->postion_id = null;
+					$trade->position_id = null;
 					$trade->save();
 				}
 			}
