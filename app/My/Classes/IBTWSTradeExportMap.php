@@ -103,10 +103,10 @@ class IBTWSTradeExportMap implements TradeImportMap
 			} elseif ($str && $str[0] == 'C') {
 				return Trade::CALL;
 			} else {
-				return '';
+				return null;
 			}
 		}else{
-			return '';
+			return null;
 		}
 		
 	}

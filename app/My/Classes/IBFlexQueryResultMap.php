@@ -133,7 +133,11 @@ class IBFlexQueryResultMap implements TradeImportMap
 				return Trade::PUT;
 			} elseif ($str && $str[0] == 'C') {
 				return Trade::CALL;
+			}else{
+				return null;
 			}
+		}else{
+			return null;
 		}
 	}
 	
