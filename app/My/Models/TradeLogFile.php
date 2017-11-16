@@ -19,7 +19,7 @@ class TradeLogFile extends Model
     /**
      * @var array
      */
-    protected $fillable = ['client_id', 'file_name', 'last_modification', 'created_at', 'updated_at'];
+    protected $fillable = ['client_id', 'file_name', 'start_date', 'end_date', 'last_modification', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

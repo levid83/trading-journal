@@ -71,41 +71,11 @@ class IBTradeLogFile implements TradeLogProvider
     private function mapTradeLog($params=[]){
         if (isset($params['data']) && !empty($params['data'])){
             $this->mapper->setData($params['data']);
-            
-            $this->mapper->map();
+			return $this->mapper->map();
 
-            return $this->mapper->getMap();
         }else{
             return false;
         }
-    }
-	
-	/**
-	 * @return mixed
-	 */
-    public function getBroker(){
-        return $this->broker;
-    }
-	
-	/**
-	 * @return mixed
-	 */
-    public function getMethod(){
-        return $this->method;
-    }
-	
-	/**
-	 * @return null
-	 */
-    public function getFile(){
-        return $this->file;
-    }
-	
-	/**
-	 * @return array
-	 */
-    public function getTradeLogs(){
-        return $this->tradeLogs;
     }
 	
 	/**
@@ -191,14 +161,18 @@ class IBTradeLogFile implements TradeLogProvider
 			->where('last_modification', '>=', $last_modified)->first();
 		
 		if ($objTradeLogFile){
+			$objTradeLogFile->start_date=isset($meta['start_date'])?$meta['start_date']:null;
+			$objTradeLogFile->start_date=isset($meta['end_date'])?$meta['end_date']:null;
 			$objTradeLogFile->last_modification=$last_modified;
 			$objTradeLogFile->save();
 		}else {
 			$objTradeLogFile = TradeLogFile::create([
-														'client_id' => $client_id,
-														'file_name' => $file,
-														'last_modification' => $last_modified
-													]);
+				'client_id' => 	$client_id,
+				'file_name' => 	$file,
+				'start_date' => isset($meta['start_date'])?$meta['start_date']:null,
+				'end_date' => 	isset($meta['end_date'])?$meta['end_date']:null,
+				'last_modification' => $last_modified
+			]);
 		}
 		
 		return $objTradeLogFile->id;
@@ -209,17 +183,41 @@ class IBTradeLogFile implements TradeLogProvider
 	 * @return bool
 	 */
 	private function hasDisruptionInTradeLog($client_id,$start_date){
-		/**
-		 * @todo remove when finalized
-		 */
-		return false;
 		
 		$previous_trade_log_exists=TradeLogFile::where('client_id',$client_id)->exists();
 		if ($previous_trade_log_exists)
-			return !TradeLogFile::where('client_id',$client_id)->where('end_date','>=',$start_date)->exist();
+			return !TradeLogFile::where('client_id',$client_id)->where('end_date','>=',$start_date)->exists();
 		else {
 			return false;
 		}
+	}
+	
+	/**
+	 * @return mixed
+	 */
+	public function getBroker(){
+		return $this->broker;
+	}
+	
+	/**
+	 * @return mixed
+	 */
+	public function getMethod(){
+		return $this->method;
+	}
+	
+	/**
+	 * @return null
+	 */
+	public function getFile(){
+		return $this->file;
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getTradeLogs(){
+		return $this->tradeLogs;
 	}
 	
 	/**
@@ -278,7 +276,6 @@ class IBTradeLogFile implements TradeLogProvider
 			function($logs, $client_account) use ($trader_id,$meta){
 				
 				$client_id=$this->getClientIdByAccount($client_account);
-				
 				if (!$this->hasDisruptionInTradeLog($client_id,$meta['start_date'])) {
 					$trade_log_file_id = $this->saveTradeLogFileMeta($this->getFilePath(), $client_id,$meta);
 					

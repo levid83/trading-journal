@@ -10,9 +10,11 @@ namespace App\My\Classes;
 
 
 use App\My\Contracts\TradeImportMap;
+use App\My\Exceptions\TradeImportException;
 use App\My\Models\Asset;
 use App\My\Models\Trade;
 use App\My\Models\TradingAccount;
+use Validator;
 
 /**
  * Class IBFlexQueryResultMap
@@ -22,32 +24,31 @@ class IBFlexQueryResultMap implements TradeImportMap
 {
 
     const MAP=[
-        'account' => 'clientaccountid',/* ClientAccountID */
-        'execution_id' => 'ibexecid',/* IBExecID - IB unique execution id */
-        'underlying' => 'underlyingsymbol', /* UnderlyingSymbol */
-        'asset_class' => 'assetclass', /* AssetClass */
-        'expiry' => 'expiry', /* Expiry */
-        'strike' => 'strike',/* Strike */
-        'put_call' => 'putcall',/* Put/Call */
-        'currency' => 'currencyprimary',/* CurrencyPrimary */
-        'action' => 'buysell',/* Buy/sell */
-        'quantity' => 'quantity',/* Quantity */
-        'description' => 'description',/* Description */
-        'financial_instrument' => 'description',/* Description */
-        'symbol' => 'symbol',/* Symbol */
-        'price'=> 'price', /* Price */
-        'time'=> 'tradetime', /* TradeTime + TradeDate*/
-        'exchange' => 'exchange',/* Exchange */
-        'commission' => 'ibcommission',/* IBCommission */
-        'order_id' => 'iborderid',/* IBOrderID */
-        'exch_exec_id' => 'extexecid',/* ExtExecID */
-        'exch_order_id' => 'exchorderid',/* ExchOrderID */
-        'open_close' => 'opencloseindicator',/* Open/Close  */
-        'costbasis' => 'costbasis',/* CostBasis */
-        'conid' => 'conid',/* Conid  */
-        'order_time' => 'ordertime',/* OrderTime  */
-        'order_type' => 'ordertype',/* OrderType  */
-		'json'=>null,
+        'account' => 				['field'=>'clientaccountid', 	'validate'=>'required|alpha_num'],
+        'execution_id' => 			['field'=>'ibexecid',			'validate'=>''],
+        'underlying' => 			['field'=>'underlyingsymbol',	'validate'=>'required'],
+        'asset_class' => 			['field'=>'assetclass',			'validate'=>'required|alpha'],
+        'expiry' => 				['field'=>'expiry',				'validate'=>'nullable|date'],
+        'strike' => 				['field'=>'strike',				'validate'=>'nullable|numeric'],
+        'put_call' => 				['field'=>'putcall',			'validate'=>'nullable|alpha'],
+        'currency' => 				['field'=>'currencyprimary',	'validate'=>'required|alpha'],
+        'action' => 				['field'=>'buysell',			'validate'=>'required|alpha'],
+        'quantity' => 				['field'=>'quantity',			'validate'=>'required|numeric'],
+        'description' => 			['field'=>'description',		'validate'=>''],
+        'financial_instrument' => 	['field'=>'description',		'validate'=>''],
+        'symbol' => 				['field'=>'symbol',				'validate'=>'required'],
+        'price'=> 					['field'=>'tradeprice',			'validate'=>'required|numeric'],
+        'time'=> 					['field'=>'tradetime',			'validate'=>'required|date'],/* Time + Date*/
+        'exchange' => 				['field'=>'exchange',			'validate'=>''],
+        'commission' => 			['field'=>'ibcommission',		'validate'=>'required|numeric'],
+        'order_id' => 				['field'=>'iborderid',			'validate'=>'required|alpha_num'],
+        'exch_exec_id' => 			['field'=>'extexecid',			'validate'=>''],
+        'exch_order_id' => 			['field'=>'exchorderid',		'validate'=>''],
+        'open_close' => 			['field'=>'opencloseindicator',	'validate'=>''],
+        'costbasis' => 				['field'=>'costbasis',			'validate'=>'numeric'],
+        'conid' => 					['field'=>'conid',				'validate'=>'required|alpha_num'],
+        'order_time' => 			['field'=>'ordertime',			'validate'=>''],
+        'order_type' => 			['field'=>'ordertype',			'validate'=>'']
     ];
 	
     private $data;
@@ -65,7 +66,7 @@ class IBFlexQueryResultMap implements TradeImportMap
 	 *
 	 * @return bool
 	 */
-    private function isDataRow($row){
+    public function isDataRow($row){
         if ($row['header']=='DATA'){
             return true;
         }else{
@@ -78,13 +79,12 @@ class IBFlexQueryResultMap implements TradeImportMap
 	 *
 	 * @return mixed|string
 	 */
-	private function fixUnderlyingSymbol($row=[]){
+	public function fixUnderlyingSymbol($row=[]){
 		
 		if (in_array($row['assetclass'], ['FOP'])) {
 			$row['underlyingsymbol'] = str_before($row['description'],' ');
-		}else{
-		
 		}
+
 		return $row['underlyingsymbol'];
 	}
 	
@@ -93,15 +93,14 @@ class IBFlexQueryResultMap implements TradeImportMap
 	 *
 	 * @return mixed|string
 	 */
-	private function fixUnderlying($row=[]){
+	public function fixUnderlying($row=[]){
 		
 		$row['underlying'] = (isset($row['underlyingsymbol']) && $row['underlyingsymbol']!='')? $row['underlyingsymbol']
 			: (isset($row['symbol']) ? $row['symbol'] : ''); /* UnderlyingSymbol or Symbol */
-		
 		return $row['underlying'];
 	}
  
-	private function fixOpenClose($row=[]){
+	public function fixOpenClose($row=[]){
 		if (isset($row['opencloseindicator'])) {
 			$str=strtoupper(trim($row['opencloseindicator']));
 			if ($str && $str[0]=='C'){
@@ -116,7 +115,7 @@ class IBFlexQueryResultMap implements TradeImportMap
 		}
 	}
 	
-	private function fixAction($row=[]){
+	public function fixAction($row=[]){
 		if (isset($row['buysell'])) {
 			$str=strtoupper(trim($row['buysell']));
 			if ($str && $str[0]=='B'){
@@ -125,25 +124,17 @@ class IBFlexQueryResultMap implements TradeImportMap
 			if ($str && $str[0]=='S'){
 				return Trade::SELL;
 			}
-			return '';
-		}else{
-			return '';
 		}
 	}
-	private function fixPutCall($row=[]){
-		if (isset($row['buysell'])) {
+	public function fixPutCall($row=[]){
+		if (!is_null($row['putcall'])) {
 			$str = strtoupper(trim($row['putcall']));
 			if ($str && $str[0] == 'P') {
 				return Trade::PUT;
 			} elseif ($str && $str[0] == 'C') {
 				return Trade::CALL;
-			} else {
-				return '';
 			}
-		}else{
-			return '';
 		}
-		
 	}
 	
 	/**
@@ -151,13 +142,13 @@ class IBFlexQueryResultMap implements TradeImportMap
 	 *
 	 * @return mixed|string
 	 */
-    private function fixStrikePrice($row=[]){
+    public function fixStrikePrice($row=[]){
 
         if (in_array($row['assetclass'], ['FOP'])) {
             $asset = Asset::where('aliases', 'like', '%'.$row['underlying'].'%')->first();
             if ($asset) {
                 if ($asset->price_correction!=1){
-                    $row['strike'] = isset($row['strike']) ? $row['strike']*$asset->price_correction:'';
+                    $row['strike'] = isset($row['strike']) ? $row['strike']*$asset->price_correction:null;
                 }
             }
         }
@@ -169,10 +160,10 @@ class IBFlexQueryResultMap implements TradeImportMap
 	 *
 	 * @return mixed|string
 	 */
-    private function fixPrice($row=[]){
+    public function fixPrice($row=[]){
 
-        $row['price'] = (isset($row['tradeprice']) && isset($row['multiplier']))? $row['tradeprice']*$row['multiplier'] : '';
-
+        $row['price'] = (isset($row['tradeprice']) && isset($row['multiplier']))? $row['tradeprice']*$row['multiplier'] : null;
+		
         return $row['price'];
     }
 	
@@ -181,13 +172,28 @@ class IBFlexQueryResultMap implements TradeImportMap
 	 *
 	 * @return string
 	 */
-    private function fixDatetime($row=[]){
+    public function fixDatetime($row=[]){
 
-        $row['time'] = isset($row['tradedate']) && isset($row['tradetime']) ? $row['tradedate'].' '.$row['tradetime']:'';
-
+        $row['time'] = isset($row['tradedate']) && isset($row['tradetime']) ? $row['tradedate'].' '.$row['tradetime']:null;
         return $row['time'];
     }
 	
+    public function validate($aux){
+    
+		$map=collect(self::MAP)->mapWithKeys(function($item,$idx){
+			return [$idx=>$item['validate']];
+		});
+		$validator =Validator::make($aux,$map->toArray());
+		$validator->sometimes(['expiry','strike'], 'required', function($data){
+			return in_array($data->asset_class,['OPT','FOP']);
+		});
+		
+		if ($validator->fails()){
+			$error_message=implode(' ',$validator->errors()->all());
+			throw new TradeImportException('Data validation failed at '.$aux['description'].' '.$error_message);
+		}
+	}
+ 
 	/**
 	 * @param $data
 	 *
@@ -199,13 +205,6 @@ class IBFlexQueryResultMap implements TradeImportMap
     }
 	
 	/**
-	 * @return mixed
-	 */
-    public function getMap(){
-        return $this->map;
-    }
-	
-	/**
 	 * 
 	 */
     public function map(){
@@ -214,9 +213,10 @@ class IBFlexQueryResultMap implements TradeImportMap
             foreach ($this->data as $row) {
                 if($this->isDataRow($row)) {
                     $aux = [];
+					
                     foreach (self::MAP as $key => $item) {
-                        if (isset($row[$item])) {
-                            $aux[$key] = $row[$item];
+                        if (isset($row[$item['field']])) {
+                            $aux[$key] = $row[$item['field']];
                         }
                     }
 					//!!! fix the $row not $aux
@@ -229,11 +229,15 @@ class IBFlexQueryResultMap implements TradeImportMap
                     $aux['strike'] = $this->fixStrikePrice($row);
                     $aux['price'] = $this->fixPrice($row);
                     $aux['time'] = $this->fixDateTime($row);
-                   
+					
 					$aux['json']=$row->toJson(); //save the raw json data
+					
+					$this->validate($aux);
+	
                     $this->map[] = $aux;
                 }
             }
         }
+		return $this->map;
     }
 }
