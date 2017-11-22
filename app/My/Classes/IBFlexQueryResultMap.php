@@ -1,13 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Levi
- * Date: 2017-10-06
- * Time: 11:25 AM
- */
-
 namespace App\My\Classes;
-
 
 use App\My\Contracts\TradeImportMap;
 use App\My\Exceptions\TradeImportException;

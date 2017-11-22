@@ -2,6 +2,7 @@
 
 namespace App\My\Models;
 
+use App\My\Traits\Filterable;
 use App\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -45,7 +46,7 @@ use PhpParser\Node\Expr\Array_;
  */
 class Trade extends Model
 {
-	use Sortable;
+	use Sortable,Filterable;
 	
 	const TRADE_TPYES=['CLOSED'=>'CLOSED','OPEN'=>'OPEN'];
 	const ASSET_CLASSES=['FOP'=>'FOP','FUT'=>'FUT','OPT'=>'OPT','STK'=>'STK'];
@@ -192,7 +193,7 @@ class Trade extends Model
 	 * @param \App\User $user
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function scopeUserAllowedTrades($query, User $user=null){
+	public function scopeFilterUser($query, User $user=null){
 		if(!is_null($user) && !$user->isSuperAdmin()) {
 			//the user can access his own trades only
 				$query->whereHas('trader.user', function ($query) {
@@ -330,19 +331,28 @@ class Trade extends Model
 	 *
 	 * @param \Illuminate\Database\Eloquent\Builder $query
 	 * @param mixed $strike_from
-	 * @param mixed $strike_to
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function scopeFilterStrike($query, $strike_from, $strike_to ){
-		
+	public function scopeFilterStrikeFrom($query, $strike_from ){
 		if ($strike_from!=''){
 			$query->where('strike','>=',$strike_from);
 		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $strike_to
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterStrikeTo($query,  $strike_to ){
 		if ($strike_to!=''){
 			$query->where('strike','<=',$strike_to);
 		}
 		return $query;
 	}
+	
 	
 	/**
 	 *
@@ -362,14 +372,25 @@ class Trade extends Model
 	 *
 	 * @param \Illuminate\Database\Eloquent\Builder $query
 	 * @param mixed $startDate
-	 * @param mixed $endDate
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function scopeFilterExpiry($query, $startDate, $endDate){
+	public function scopeFilterExpiryFrom($query, $startDate){
 		
 		if ($startDate!=''){
 			$query->where('expiration','>=',$startDate);
 		}
+		
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $endDate
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterExpiryto($query,  $endDate){
+		
 		if ($endDate!=''){
 			$query->where('expiration','<=',$endDate);
 		}
@@ -380,14 +401,23 @@ class Trade extends Model
 	 *
 	 * @param \Illuminate\Database\Eloquent\Builder $query
 	 * @param mixed $startDate
-	 * @param mixed $endDate
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function scopeFilterOpenDate($query, $startDate, $endDate){
+	public function scopeFilterOpenDateFrom($query, $startDate){
 		
 		if ($startDate!=''){
 			$query->where('open_date','>=',$startDate);
 		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $endDate
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterOpenDateTo($query, $endDate){
 		if ($endDate!=''){
 			$query->where('open_date','<=',$endDate);
 		}
@@ -398,14 +428,24 @@ class Trade extends Model
 	 *
 	 * @param \Illuminate\Database\Eloquent\Builder $query
 	 * @param mixed $startDate
-	 * @param mixed $endDate
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	public function scopeFilterCloseDate($query, $startDate, $endDate){
+	public function scopeFilterCloseDateFrom($query, $startDate){
 		
 		if ($startDate!=''){
 			$query->where('close_date','>=',$startDate);
 		}
+		return $query;
+	}
+	
+	/**
+	 *
+	 * @param \Illuminate\Database\Eloquent\Builder $query
+	 * @param mixed $endDate
+	 * @return \Illuminate\Database\Eloquent\Builder
+	 */
+	public function scopeFilterCloseDateTo($query, $endDate){
+
 		if ($endDate!=''){
 			$query->where('close_date','<=',$endDate);
 		}

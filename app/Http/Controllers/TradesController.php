@@ -5,20 +5,33 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\My\Classes\TradeFilters;
+use App\My\Repositories\Contracts\TradeRepository;
 use App\My\Models\Position;
-use App\My\Models\TradingAccount;
-use App\User;
-use App\My\Models\Tactic;
 use App\My\Models\Trade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use PhpParser\Node\Expr\Array_;
 use Session;
-use DB;
 use TCG\Voyager\Facades\Voyager;
 
 class TradesController extends Controller
 {
+	
+	/**
+	 * @var TradeRepository
+	 */
+	private $tradeRepo;
+	
+	/**
+	 * TradesController constructor.
+	 *
+	 * @param TradeRepository $tradeRepo
+	 */
+	
+	function __construct(TradeRepository $tradeRepo) {
+		$this->tradeRepo=$tradeRepo;
+	}
+	
 	private function updateTactics($tacticId, Array $trades){
 		if (!empty($trades) && $tacticId>0){
 			foreach ($trades as $id){
@@ -129,64 +142,34 @@ class TradesController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index(Request $request)
+    public function index(TradeFilters $filters, Request $request)
     {
-
     	if(Voyager::can('edit_trades')){
     		$this->editTrades($request);
 		}else{
     		Session::flash("error","You have no permission to update these trades");
 		}
-//dd($request);
-		//DB::enableQueryLog();
-		$trades = Trade::with('tactic')
-			->with('position')
-			->with('trader')
-			->with('client')
-			->userAllowedTrades(Auth::user()) //only the user's trades
-			->filterClient($request->input('filter_client_id'))
-			->filterTrader($request->input('filter_trader_id'))
-			->filterUnderlying($request->input('filter_underlying'))
-			->filterPosition($request->input('filter_position_id'))
-			->filterTactic($request->input('filter_tactic_id'))
-			->filterStatus($request->input('filter_status'))
-			->filterAssetClass($request->input('filter_asset_class'))
-			->filterAction($request->input('filter_action'))
-			->filterStrike($request->input('filter_strike_from'),$request->input('filter_strike_to'))
-			->filterPutCall($request->input('filter_put_call'))
-			->filterExpiry($request->input('filter_expiration_from'),$request->input('filter_expiration_to'))
-			->filterOpenDate($request->input('filter_open_date_from'),$request->input('filter_open_date_to'))
-			->filterCloseDate($request->input('filter_close_date_from'),$request->input('filter_close_date_to'))
-			->sortable()
-			->simplePaginate(30);
-    	//dd(DB::getQueryLog());
-
+		
+		$trades=$this->tradeRepo->search($filters)
+								->sortable()
+								->simplePaginate(30);
+			
 		$request->flashExcept(['trade']);
 		
-		
-		$positions=Position::whereHas('trades',
-						function($query) use ($request){
-							$query->filterClient($request->input('filter_client_id'))
-									->filterTrader($request->input('filter_trader_id'))
-									->filterUnderLying($request->input('filter_underlying'));
-						}
-					)->orderBy('id','desc')->get();
-	
 		if($request->ajax()){
 			return response()->json($trades);
 		}else {
-			//return response()->json($trades);
 			
 			return view('admin.trades.index')
 				->with('trades', $trades)
-				->with('traders', TradingAccount::where('account_type', TradingAccount::TRADER)->orderBy('account_name', 'asc')->get())
-				->with('clients', TradingAccount::where('account_type', TradingAccount::CLIENT)->orderBy('account_name', 'asc')->get())
-				->with('trade_types', Trade::TRADE_TPYES)
-				->with('asset_classes', Trade::ASSET_CLASSES)
-				->with('trade_actions', Trade::ACTIONS)
-				->with('option_types', Trade::OPTION_TYPES)
-				->with('tactics', Tactic::where('id', '>', 0)->orderBy('name', 'asc')->get())
-				->with('positions', $positions);
+				->with('traders', $this->tradeRepo->traders())
+				->with('clients', $this->tradeRepo->clients())
+				->with('trade_types', $this->tradeRepo->tradeTypes())
+				->with('asset_classes', $this->tradeRepo->assetClasses())
+				->with('trade_actions', $this->tradeRepo->actions())
+				->with('option_types', $this->tradeRepo->optionTypes())
+				->with('tactics', $this->tradeRepo->tactics())
+				->with('positions', $this->tradeRepo->positions($filters));
 		}
     }
 
