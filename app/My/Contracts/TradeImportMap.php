@@ -4,15 +4,11 @@ namespace App\My\Contracts;
 interface TradeImportMap
 {
 	
-	/**
-	 * @param $data
-	 *
-	 * @return mixed
-	 */
-    public function setData($data);
 	
 	/**
-	 * @return mixed
+	 * @param array $data
+	 *
+	 * @return Array
 	 */
-    public function map();
+    public function map(array $data): array ;
 }

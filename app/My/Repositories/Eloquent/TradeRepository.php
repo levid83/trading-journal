@@ -1,17 +1,19 @@
 <?php
 
-	namespace App\My\Repositories;
+	namespace App\My\Repositories\Eloquent;
 	
 	use App\My\Classes\TradeFilters;
+	use App\My\Models\Asset;
 	use App\My\Models\Position;
 	use App\My\Models\Tactic;
 	use App\My\Models\TradingAccount;
 	use Illuminate\Support\Facades\Auth;
 	
-	use App\My\Repositories\Contracts\TradeRepository;
+	use App\My\Repositories\Contracts\TradeRepositoryInterface;
 	use App\My\Models\Trade;
+	use phpDocumentor\Reflection\Types\This;
 	
-	class DbTradeRepository extends DbRepository implements TradeRepository
+	class TradeRepository extends Repository implements TradeRepositoryInterface
 	{
 		
 		/**
@@ -71,10 +73,12 @@
 		}
 		
 		
-		public function tactics(){
+		public function tactics($filters=null){
 			return Tactic::where('id', '>', 0)->orderBy('name', 'asc')->get();
 		}
 		
+		public function assets($filters=null){
+			return Asset::all();
+		}
 		
-
 	}

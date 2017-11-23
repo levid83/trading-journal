@@ -36,6 +36,6 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Krlove\EloquentModelGenerator\Provider\GeneratorServiceProvider::class);
         }
         
-        $this->app->bind('App\My\Repositories\Contracts\TradeRepository','App\My\Repositories\DbTradeRepository');
+        $this->app->bind('App\My\Repositories\Contracts\TradeRepositoryInterface', 'App\My\Repositories\Eloquent\TradeRepository');
     }
 }

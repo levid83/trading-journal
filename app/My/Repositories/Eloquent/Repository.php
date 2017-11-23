@@ -1,9 +1,9 @@
 <?php
 
-	namespace App\My\Repositories;
+	namespace App\My\Repositories\Eloquent;
 	
 	
-	abstract class DbRepository
+	abstract class Repository
 	{
 		/**
 		 * Eloquent model

@@ -6,7 +6,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use App\My\Classes\TradeFilters;
-use App\My\Repositories\Contracts\TradeRepository;
+use App\My\Repositories\Contracts\TradeRepositoryInterface;
 use App\My\Models\Position;
 use App\My\Models\Trade;
 use Illuminate\Http\Request;
@@ -18,17 +18,17 @@ class TradesController extends Controller
 {
 	
 	/**
-	 * @var TradeRepository
+	 * @var TradeRepositoryInterface
 	 */
 	private $tradeRepo;
 	
 	/**
 	 * TradesController constructor.
 	 *
-	 * @param TradeRepository $tradeRepo
+	 * @param TradeRepositoryInterface $tradeRepo
 	 */
 	
-	function __construct(TradeRepository $tradeRepo) {
+	function __construct(TradeRepositoryInterface $tradeRepo) {
 		$this->tradeRepo=$tradeRepo;
 	}
 	
