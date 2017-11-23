@@ -3,6 +3,7 @@
 namespace App\My\Classes;
 
 use App\My\Models\Trade;
+use App\My\Repositories\Eloquent\TradeRepository;
 use Carbon\Carbon;
 use Excel;
 use DB;
@@ -27,7 +28,7 @@ class IBTradeLogFile implements TradeLogProvider
     const MANUAL=1;
     const AUTOMATED=2;
 
-    const DIRECTORIES=[1=>'csv/manual/',2=>'csv/automated/'];
+    const DIRECTORIES=[1=>'Csv/manual/',2=>'Csv/automated/'];
 
     private $broker;
     private $method;
@@ -64,8 +65,7 @@ class IBTradeLogFile implements TradeLogProvider
 	 */
     private function mapTradeLog($params=[]){
         if (isset($params['data']) && !empty($params['data'])){
-            $this->mapper->setData($params['data']);
-			return $this->mapper->map();
+			return $this->mapper->map($params['data']);
 
         }else{
             return false;
@@ -78,7 +78,7 @@ class IBTradeLogFile implements TradeLogProvider
 	 * @return bool|string
 	 */
     private function getAccountIdFromDirectoryName($directory=''){
-		return str_replace_first('csv/automated/'.TradeImport::BROKER_DIRECTORIES[$this->broker], '', $directory);
+		return str_replace_first('Csv/automated/'.TradeImport::BROKER_DIRECTORIES[$this->broker], '', $directory);
     }
     
     private function addTraderIfNotExists($trader_id=null){
@@ -254,7 +254,7 @@ class IBTradeLogFile implements TradeLogProvider
 	 * @return array|bool
 	 */
     public function parseCsvFile($filename){
-		return $this->mapTradeLog(['data'=>Excel::load(storage_path('app/' . $filename))->get()]);
+		return $this->mapTradeLog(['data'=>Excel::load(storage_path('app/' . $filename))->get()->toArray()]);
     }
 	
 	public function postProcessingTradeLog($logs,$meta){
@@ -335,9 +335,9 @@ class IBTradeLogFile implements TradeLogProvider
 
         if ($this->getBroker()==TradeImport::INTERACTIVE_BROKERS) {
             if ($this->getMethod() == self::MANUAL) {
-                return new IBFlexQueryResultMap();
+                return new IBFlexQueryResultMap(new TradeRepository(new Trade()));
             } elseif ($this->getMethod() == self::AUTOMATED) {
-                return new IBTWSTradeExportMap();
+                return new IBTWSTradeExportMap(new TradeRepository(new Trade()));
             } else {
                 throw new TradeImportException("Import method ".$this->getMethod()." doesn't exist! ");
             }

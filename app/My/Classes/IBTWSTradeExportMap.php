@@ -41,10 +41,7 @@ class IBTWSTradeExportMap implements TradeImportMap
         'price_incl_fees' => 		['field' =>	'price_incl._fees',		'validate'=> ''],
         'open_close' => 			['field' =>	'openclose',			'validate'=> ''],
     ];
-
-    private $data;
-    private $map;
-	
+		
 	/**
 	 * @param array $row
 	 *
@@ -167,22 +164,12 @@ class IBTWSTradeExportMap implements TradeImportMap
 	}
 	
 	/**
-	 * @param $data
-	 *
-	 * @return $this
-	 */
-    public function setData($data){
-        $this->data=$data;
-        return $this;
-    }
-	
-	/**
 	 * @param array $params
 	 */
-    public function map(Array $params=array()){
-        $this->map=[];
-        if (!empty($this->data)){
-            foreach ($this->data as $row) {
+    public function map($data){
+    	$map=array();
+         if (!empty($data)){
+            foreach ($data as $row) {
                 if(!$this->isCombo($row)){
                     $aux = [];
 					foreach (self::MAP as $key => $item) {
@@ -199,11 +186,11 @@ class IBTWSTradeExportMap implements TradeImportMap
 					$aux['json']=$row->toJson(); //save the raw json data
 					
 					$this->validate($aux);
-					
-                    $this->map[] = $aux;
+	
+					$map[] = $aux;
                 }
             }
         }
-        return $this->map;
+        return $map;
     }
 }

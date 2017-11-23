@@ -6,6 +6,9 @@ use App\My\Exceptions\TradeImportException;
 use App\My\Models\Asset;
 use App\My\Models\Trade;
 use App\My\Models\TradingAccount;
+use App\My\Repositories\Contracts\TradeRepositoryInterface;
+use Illuminate\Support\Collection;
+use Mockery\Exception;
 use Validator;
 
 /**
@@ -42,15 +45,17 @@ class IBFlexQueryResultMap implements TradeImportMap
         'order_time' => 			['field'=>'ordertime',			'validate'=>''],
         'order_type' => 			['field'=>'ordertype',			'validate'=>'']
     ];
+    
+    private $tradeRepo;
 	
-    private $data;
-    private $map;
-	
+    private $assets;
+    
 	/**
 	 * IBFlexQueryResultMap constructor.
 	 */
-    public function __construct(){
-
+    public function __construct(TradeRepositoryInterface $tradeRepo){
+		$this->tradeRepo=$tradeRepo;
+		$this->assets=collect($this->tradeRepo->assets()->toArray());
     }
 	
 	/**
@@ -74,9 +79,8 @@ class IBFlexQueryResultMap implements TradeImportMap
 	public function fixUnderlyingSymbol($row=[]){
 		
 		if (in_array($row['assetclass'], ['FOP'])) {
-			$row['underlyingsymbol'] = str_before($row['description'],' ');
+			$row['underlyingsymbol'] = str_before($row['description']," ");
 		}
-
 		return $row['underlyingsymbol'];
 	}
 	
@@ -96,14 +100,14 @@ class IBFlexQueryResultMap implements TradeImportMap
 		if (isset($row['opencloseindicator'])) {
 			$str=strtoupper(trim($row['opencloseindicator']));
 			if ($str && $str[0]=='C'){
-				return Trade::CLOSE_TRADE;
+				return $this->tradeRepo::CLOSE_TRADE;
 			}elseif($str && $str[0]=='O'){
-				return Trade::OPEN_TRADE;
+				return $this->tradeRepo::OPEN_TRADE;
 			}else{
-				return '';
+				return null;
 			}
 		}else{
-			return '';
+			return null;
 		}
 	}
 	
@@ -111,20 +115,20 @@ class IBFlexQueryResultMap implements TradeImportMap
 		if (isset($row['buysell'])) {
 			$str=strtoupper(trim($row['buysell']));
 			if ($str && $str[0]=='B'){
-				return Trade::BUY;
+				return $this->tradeRepo::BUY;
 			}
 			if ($str && $str[0]=='S'){
-				return Trade::SELL;
+				return $this->tradeRepo::SELL;
 			}
 		}
 	}
 	public function fixPutCall($row=[]){
-		if (!is_null($row['putcall'])) {
+		if (isset($row['putcall'])) {
 			$str = strtoupper(trim($row['putcall']));
 			if ($str && $str[0] == 'P') {
-				return Trade::PUT;
+				return $this->tradeRepo::PUT;
 			} elseif ($str && $str[0] == 'C') {
-				return Trade::CALL;
+				return $this->tradeRepo::CALL;
 			}else{
 				return null;
 			}
@@ -140,11 +144,16 @@ class IBFlexQueryResultMap implements TradeImportMap
 	 */
     public function fixStrikePrice($row=[]){
 
+    	if (!isset($row['strike']) || $row['strike']=='') return null;
+    	
         if (in_array($row['assetclass'], ['FOP'])) {
-            $asset = Asset::where('aliases', 'like', '%'.$row['underlying'].'%')->first();
+        	$asset=$this->assets->first(function($value,$key) use ($row){
+        		return in_array($row['underlying'],explode(',',$value['aliases']));
+			});
+				
             if ($asset) {
-                if ($asset->price_correction!=1){
-                    $row['strike'] = isset($row['strike']) ? $row['strike']*$asset->price_correction:null;
+                if ($asset['price_correction']!=1){
+                    $row['strike'] = isset($row['strike']) ? $row['strike']*$asset['price_correction']:null;
                 }
             }
         }
@@ -166,74 +175,111 @@ class IBFlexQueryResultMap implements TradeImportMap
 	/**
 	 * @param array $row
 	 *
-	 * @return string
+	 * @return null|string
 	 */
-    public function fixDatetime($row=[]){
-
-        $row['time'] = isset($row['tradedate']) && isset($row['tradetime']) ? $row['tradedate'].' '.$row['tradetime']:null;
+    public function fixDatetime($row=[]) {
+	
+		if (!isset($row['tradedate']) || $row['tradedate']=='') return null;
+		if (!isset($row['tradetime']) || $row['tradetime']=='') return null;
+    	
+        $row['time'] = $row['tradedate'].' '.$row['tradetime'];
         return $row['time'];
     }
 	
-    public function validate($aux){
-    
-		$map=collect(self::MAP)->mapWithKeys(function($item,$idx){
-			return [$idx=>$item['validate']];
+	/**
+	 * @param Collection $dataCollection
+	 *
+	 * @return Collection
+	 */
+    public function removeHeaders(Collection $dataCollection) : Collection{
+    	return $dataCollection->filter(function($values){
+			return $values['header']=='DATA';
 		});
-		$validator =Validator::make($aux,$map->toArray());
-		$validator->sometimes(['expiry','strike'], 'required', function($data){
-			return in_array($data->asset_class,['OPT','FOP']);
+	}
+	
+	/**
+	 * @param Collection $dataCollection
+	 *
+	 * @return Collection
+	 */
+	public function transformData(Collection $dataCollection): Collection{
+		
+		$transformationMap=collect(self::MAP);
+  
+		return $dataCollection->map(function($row) use($transformationMap){
+			
+			$new_values = $transformationMap->map(function ($item, $idx) use ($row) {
+				return isset($row[ $item['field'] ]) ? $row[ $item['field']] : null;
+			});
+			
+			$row['underlyingsymbol'] = $this->fixUnderlyingSymbol($row);//!!! fix the $row not $new_values
+			$new_values['underlying'] = $this->fixUnderlying($row);
+			
+			$row['underlying']=$new_values['underlying']; //needed at fixStrikePrice
+			
+			$new_values['open_close'] = $this->fixOpenClose($row);
+			$new_values['action'] = $this->fixAction($row);
+			$new_values['put_call'] = $this->fixPutCall($row);
+			
+			$new_values['strike'] = $this->fixStrikePrice($row);
+			
+			$new_values['price'] = $this->fixPrice($row);
+			$new_values['time'] = $this->fixDateTime($row);
+			$new_values['json'] = json_encode($row); //save the raw json data
+			
+			return $new_values;
+		});
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getValidationRules(): array {
+		return collect(self::MAP)->mapWithKeys(function ($item, $idx) {
+			return [$idx => $item['validate']];
+		})->toArray();
+	}
+	
+	/**
+	 * @param Collection $dataCollection
+	 * @param array      $validationRules
+	 *
+	 * @return bool
+	 */
+    public function validateMap(Collection $dataCollection,array $validationRules): bool {
+				
+		$dataCollection->each(function ($row, $idx) use ($validationRules) {
+			
+			$validator = Validator::make($row->toArray(), $validationRules);
+			
+			$validator->sometimes(['expiry', 'strike'], 'required', function ($data) {
+				return in_array($data->asset_class, ['OPT', 'FOP']);
+			});
+			
+			if ($validator->fails()) {
+				$error_message = implode(' ', $validator->errors()->all());
+				throw new TradeImportException('Data validation failed at ' . $row['description'] . ' ' . $error_message);
+			}
 		});
 		
-		if ($validator->fails()){
-			$error_message=implode(' ',$validator->errors()->all());
-			throw new TradeImportException('Data validation failed at '.$aux['description'].' '.$error_message);
-		}
+		return true;
 	}
- 
+	
 	/**
-	 * @param $data
+	 * @param array $data
 	 *
-	 * @return $this
+	 * @return array
 	 */
-    public function setData($data){
-        $this->data=$data;
-        return $this;
-    }
+    public function map(array $data) : array {
+		
+		$dataCollection = $this->removeHeaders(collect($data));
 	
-	/**
-	 * 
-	 */
-    public function map(){
-        $this->map=array();
-        if (!empty($this->data)) {
-            foreach ($this->data as $row) {
-                if($this->isDataRow($row)) {
-                    $aux = [];
-					
-                    foreach (self::MAP as $key => $item) {
-                        if (isset($row[$item['field']])) {
-                            $aux[$key] = $row[$item['field']];
-                        }
-                    }
-					//!!! fix the $row not $aux
-					$row['underlyingsymbol'] = $this->fixUnderlyingSymbol($row);
-					
-					$aux['underlying'] = $this->fixUnderlying($row);
-					$aux['open_close']=$this->fixOpenClose($row);
-					$aux['action']=$this->fixAction($row);
-					$aux['put_call']=$this->fixPutCall($row);
-                    $aux['strike'] = $this->fixStrikePrice($row);
-                    $aux['price'] = $this->fixPrice($row);
-                    $aux['time'] = $this->fixDateTime($row);
-					
-					$aux['json']=$row->toJson(); //save the raw json data
-					
-					$this->validate($aux);
+		$resultCollection= $this->transformData($dataCollection);
+		
+		$this->validateMap($resultCollection,$this->getValidationRules());
 	
-                    $this->map[] = $aux;
-                }
-            }
-        }
-		return $this->map;
-    }
+		return $resultCollection->toArray();
+	}
+		
+ 
 }
