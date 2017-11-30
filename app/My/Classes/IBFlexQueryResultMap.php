@@ -1,15 +1,14 @@
 <?php
+
 namespace App\My\Classes;
 
 use App\My\Contracts\TradeImportMap;
 use App\My\Exceptions\TradeImportException;
-use App\My\Models\Asset;
-use App\My\Models\Trade;
-use App\My\Models\TradingAccount;
 use App\My\Repositories\Contracts\TradeRepositoryInterface;
 use Illuminate\Support\Collection;
-use Mockery\Exception;
 use Validator;
+
+
 
 /**
  * Class IBFlexQueryResultMap
@@ -49,113 +48,128 @@ class IBFlexQueryResultMap implements TradeImportMap
     private $tradeRepo;
 	
     private $assets;
-    
+	
 	/**
 	 * IBFlexQueryResultMap constructor.
+	 *
+	 * @param TradeRepositoryInterface $tradeRepo
 	 */
     public function __construct(TradeRepositoryInterface $tradeRepo){
 		$this->tradeRepo=$tradeRepo;
-		$this->assets=collect($this->tradeRepo->assets()->toArray());
+		$this->setAssets($this->tradeRepo->assets());
     }
 	
+	/**
+	 * @param Collection $assets
+	 */
+    public function setAssets(Collection $assets) {
+    	$this->assets=$assets;
+	}
+ 
 	/**
 	 * @param $row
 	 *
 	 * @return bool
 	 */
-    public function isDataRow($row){
-        if ($row['header']=='DATA'){
-            return true;
-        }else{
-            return false;
-        }
+    public function isDataRow($row): bool {
+        if ($row['header']=='DATA') {
+			return true;
+		}
+        return false;
     }
 	
 	/**
 	 * @param array $row
 	 *
-	 * @return mixed|string
+	 * @return string
 	 */
-	public function fixUnderlyingSymbol($row=[]){
-		
+	public function fixUnderlyingSymbol($row=[]) : string {
 		if (in_array($row['assetclass'], ['FOP'])) {
-			$row['underlyingsymbol'] = str_before($row['description']," ");
-		}
-		return $row['underlyingsymbol'];
-	}
-	
-	/**
-	 * @param array $row
-	 *
-	 * @return mixed|string
-	 */
-	public function fixUnderlying($row=[]){
-		
-		$row['underlying'] = (isset($row['underlyingsymbol']) && $row['underlyingsymbol']!='')? $row['underlyingsymbol']
-			: (isset($row['symbol']) ? $row['symbol'] : ''); /* UnderlyingSymbol or Symbol */
-		return $row['underlying'];
-	}
- 
-	public function fixOpenClose($row=[]){
-		if (isset($row['opencloseindicator'])) {
-			$str=strtoupper(trim($row['opencloseindicator']));
-			if ($str && $str[0]=='C'){
-				return $this->tradeRepo::CLOSE_TRADE;
-			}elseif($str && $str[0]=='O'){
-				return $this->tradeRepo::OPEN_TRADE;
-			}else{
-				return null;
-			}
-		}else{
-			return null;
-		}
-	}
-	
-	public function fixAction($row=[]){
-		if (isset($row['buysell'])) {
-			$str=strtoupper(trim($row['buysell']));
-			if ($str && $str[0]=='B'){
-				return $this->tradeRepo::BUY;
-			}
-			if ($str && $str[0]=='S'){
-				return $this->tradeRepo::SELL;
-			}
-		}
-	}
-	public function fixPutCall($row=[]){
-		if (isset($row['putcall'])) {
-			$str = strtoupper(trim($row['putcall']));
-			if ($str && $str[0] == 'P') {
-				return $this->tradeRepo::PUT;
-			} elseif ($str && $str[0] == 'C') {
-				return $this->tradeRepo::CALL;
-			}else{
-				return null;
-			}
-		}else{
-			return null;
+			return str_before($row['description'], " ");
+		}else {
+			return $row['underlyingsymbol'];
 		}
 	}
 	
 	/**
 	 * @param array $row
 	 *
-	 * @return mixed|string
+	 * @return string
 	 */
-    public function fixStrikePrice($row=[]){
+	public function fixUnderlying($row=[]) : string {
+		if (isset($row['underlyingsymbol']) && $row['underlyingsymbol']!=='') {
+			return $row['underlyingsymbol'];
+		}
+		return  $row['symbol'] ?? '';
+	}
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return string
+	 */
+	public function fixOpenClose($row=[]) : string {
+		if (!isset($row['opencloseindicator'])) return '';
 
-    	if (!isset($row['strike']) || $row['strike']=='') return null;
-    	
+		$str=strtoupper(trim($row['opencloseindicator']));
+		if ($str && $str[0]==='C') {
+			return $this->tradeRepo::CLOSE_TRADE;
+		}elseif($str && $str[0]==='O'){
+			return $this->tradeRepo::OPEN_TRADE;
+		}
+		return '';
+	}
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return string
+	 */
+	public function fixAction($row=[]) : string {
+		if (!isset($row['buysell'])) return '';
+		$str=strtoupper(trim($row['buysell']));
+		if ($str && $str[0]==='B'){
+			return $this->tradeRepo::BUY;
+		}
+		if ($str && $str[0]==='S'){
+			return $this->tradeRepo::SELL;
+		}
+		return '';
+	}
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return string
+	 */
+	public function fixPutCall($row=[]) : string{
+		if (!isset($row['putcall'])) return '';
+		$str = strtoupper(trim($row['putcall']));
+		if ($str && $str[0] === 'P') {
+			return $this->tradeRepo::PUT;
+		} elseif ($str && $str[0] === 'C') {
+			return $this->tradeRepo::CALL;
+		}
+		return '';
+	}
+	
+	/**
+	 * @param array $row
+	 *
+	 * @return mixed|null
+	 */
+    public function fixStrikePrice($row=[])  {
+    	if (!isset($row['strike']) || $row['strike']==='') return null;
         if (in_array($row['assetclass'], ['FOP'])) {
-        	$asset=$this->assets->first(function($value,$key) use ($row){
-        		return in_array($row['underlying'],explode(',',$value['aliases']));
-			});
-				
-            if ($asset) {
-                if ($asset['price_correction']!=1){
-                    $row['strike'] = isset($row['strike']) ? $row['strike']*$asset['price_correction']:null;
-                }
-            }
+        	$asset=$this->assets->first(
+        		function($value,$key) use ($row){
+        			return in_array($row['underlying'],explode(',',$value['aliases']));
+				}
+			);
+            if (!$asset || $asset['price_correction']==1) {
+				return $row['strike'];
+			}
+			return $row['strike']*$asset['price_correction'];
         }
         return $row['strike'];
     }
@@ -165,25 +179,27 @@ class IBFlexQueryResultMap implements TradeImportMap
 	 *
 	 * @return mixed|string
 	 */
-    public function fixPrice($row=[]){
-
-        $row['price'] = (isset($row['tradeprice']) && isset($row['multiplier']))? $row['tradeprice']*$row['multiplier'] : null;
-		
-        return $row['price'];
+    public function fixPrice($row=[])  {
+    	
+    	if (!isset($row['tradeprice']) || $row['tradeprice']==='') return null;
+    	
+		if (isset($row['multiplier']) && $row['multiplier']>1){
+			return ($row['multiplier']*$row['tradeprice']);
+		}
+        return $row['tradeprice'];
     }
 	
 	/**
 	 * @param array $row
 	 *
-	 * @return null|string
+	 * @return string
 	 */
-    public function fixDatetime($row=[]) {
+    public function fixDatetime($row=[]) : string {
 	
-		if (!isset($row['tradedate']) || $row['tradedate']=='') return null;
-		if (!isset($row['tradetime']) || $row['tradetime']=='') return null;
-    	
-        $row['time'] = $row['tradedate'].' '.$row['tradetime'];
-        return $row['time'];
+		if (!isset($row['tradedate']) || $row['tradedate']==='') return '';
+		if (!isset($row['tradetime']) || $row['tradetime']==='') return '';
+		
+        return $row['tradedate'].' '.$row['tradetime'];
     }
 	
 	/**
@@ -206,7 +222,7 @@ class IBFlexQueryResultMap implements TradeImportMap
 		
 		$transformationMap=collect(self::MAP);
   
-		return $dataCollection->map(function($row) use($transformationMap){
+		return $dataCollection->transform(function($row) use($transformationMap){
 			
 			$new_values = $transformationMap->map(function ($item, $idx) use ($row) {
 				return isset($row[ $item['field'] ]) ? $row[ $item['field']] : null;
