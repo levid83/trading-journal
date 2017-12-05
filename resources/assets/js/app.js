@@ -15,10 +15,10 @@ Vue = require('vue');
 Vue.config.debug = true
 Vue.config.devtools = true
 
-import router from './admin/router/index.js'
-import store from './admin/store/trade.js'
+import router from '../admin/router/index.js'
+import store from '../admin/store/trade.js'
 
-import TradesPage from './admin/pages/TradesPage.vue'
+import TradesPage from '../admin/pages/TradesPage.vue'
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
