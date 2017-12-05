@@ -1,0 +1,23 @@
+.cssload-aim{
+  left: calc(100% - 120px) !important;
+}
+@media (min-width: 768px) {
+ body{
+    width:90%;
+    box-shadow:0 2px 6px 4px #ccc;
+    .header.fixed-top{
+    width:90%;
+    margin:0 auto;
+    }
+  }
+	.wrapper > .right-aside {
+        width: 100% !important;
+        min-width: 100% !important;
+    }
+}
+@media (max-width:767px){
+  .wrapper > .right-aside {
+  width: 100vw;
+  max-width: 100vw;  }
+}
+

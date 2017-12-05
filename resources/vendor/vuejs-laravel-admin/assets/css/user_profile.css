@@ -1,0 +1,213 @@
+.profile {
+    padding-bottom: 15px;
+}
+
+.user-rating {
+    font-size: 16px;
+    border-right: 2px solid #ccc;
+}
+
+.panel-heading.data {
+    padding: 0 15px;
+}
+
+
+/*custom tabs*/
+
+.nav-tabs > li > a {
+    color: #888;
+    padding: 10px 20px;
+}
+
+.nav-tabs > li.active > a:after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    display: block;
+    width: 70%;
+    left: 15%;
+    border-bottom: 4px solid #3399FF;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    color: #3399FF;
+    background-color: transparent;
+    border: 0;
+    border-bottom-color: transparent;
+}
+
+.profile_details .tab-content {
+    padding: 20px 10px 0;
+}
+
+.profile_details #tab-details label {
+    font-weight: bold;
+    color: #8f8f8f;
+    border-bottom: 2px dotted #ccc;
+}
+
+.profile_details #tab-details p.info {
+    font-size: 16px;
+}
+
+.dl-horizontal dt {
+    width: 40%;
+    float: left;
+    clear: left;
+    text-align: right;
+    margin-bottom: 15px;
+    color: #777;
+}
+
+.dl-horizontal dd {
+    margin-left: 43%;
+}
+
+
+/*project details*/
+
+.nav_border > li > a {
+    padding: 10px 2px;
+    line-height: 20px;
+}
+
+.nav_border > li:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.nav.nav-stacked > li > a:hover,
+.nav.nav-stacked > li > a:focus {
+    background-color: #f9f9f9;
+}
+
+
+/*connections*/
+
+.connection {
+    box-shadow: 0 0 5px #ccc;
+    border: 1px solid #efefef;
+    margin: 25px 0 0;
+    position: relative;
+}
+
+.connect-head {
+    width: 100%;
+    padding: 12px 0;
+    position: relative;
+}
+
+.connect-head img {
+    width: 80px;
+}
+
+.connect-head p {
+    margin-bottom: 0;
+}
+
+.connect-data {
+    width: 50%;
+    float: left;
+    color: #FFF;
+    padding: 14px 0;
+    position: relative;
+}
+
+.connect-data .count {
+    font-size: 18px;
+}
+
+.connect-bg1 {
+    background-color: #394263;
+}
+
+.connect-bg2 {
+    background-color: #3B3F40;
+}
+
+.connect-bg3 {
+    background-color: #4A2E2B;
+}
+
+.connect-bg4 {
+    background-color: #583A63;
+}
+
+
+/*connections end*/
+
+
+/*blogs*/
+
+.blog-border {
+    box-shadow: 0 0 5px #ccc;
+    cursor: pointer;
+    margin: 20px 0;
+}
+
+#blog p {
+    margin: 0;
+}
+
+.blog-image {
+    width: 70px;
+}
+
+.blog-heading {
+    position: relative;
+}
+
+.blog-heading .post-by {
+    display: block;
+}
+
+#blog .sharedpost-image {
+    width: 100%;
+    height: 220px;
+}
+
+#blog .attached-image {
+    width: 100%;
+    height: 170px;
+}
+
+#blog .posted-image {
+    width: 100%;
+    height: 277px;
+}
+
+.blog-desc {
+    position: absolute;
+    bottom: 0;
+    padding: 10px 13px;
+    background-color: rgba(0, 0, 0, .3);
+    width: 100%;
+    color: #FFF;
+}
+
+
+/*end of blogs*/
+
+.badge {
+    display: inline-block;
+    min-width: 10px;
+    padding: 3px 7px;
+    padding-top: 3px;
+    padding-right: 7px;
+    padding-bottom: 3px;
+    padding-left: 7px;
+    font-size: 12px;
+    color: #fff;
+    vertical-align: middle;
+    border-radius: 10px;
+}
+
+.project-deatails a {
+    width: 100%;
+}
+
+.profile-thumb {
+    height: 150px;
+    width: 150px;
+}

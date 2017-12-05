@@ -1,0 +1,296 @@
+h5 {
+    color: gray;
+}
+.progressbar_height {
+    height: 4px !important;
+}
+.model {
+    margin-left: 15px;
+}
+.tot_boxline {
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+.name_visitors {
+    margin-left: 15px;
+    padding: 10px 10px;
+    background-color: #fff;
+}
+
+.price_red {
+    color: #cd5c5c;
+    font-size: 20px;
+}
+.deal_image {
+    position: absolute;
+    right: 15px;
+}
+
+.progress_height {
+    height: 10px !important;
+}
+
+.model {
+    color: #636063;
+}
+
+.percent_rate {
+    font-size: 25px;
+}
+
+.text-gray {
+    color: gray;
+}
+.perce_size{
+    font-size:20px;
+    color:green;
+}
+.perce_size2{
+    font-size:20px;
+    color:#FD7570;
+}
+
+.pie_rate {
+    position: absolute;
+    left: 40.4%;
+    top: 24%;
+}
+
+.view {
+    font-size: 50px;
+    line-height: 190px;
+    color: gray;
+    cursor: pointer;
+
+}
+
+.bg_card {
+    background-color: #f7f7f7;
+}
+.number_font {
+    font-size: 20px;
+    color: green;
+
+    font-weight: 500;
+    margin-left: -5px;
+}
+.number_font2{
+    font-size: 20px;
+    color: #D83630;
+    font-weight: 500;
+    margin-left: -5px;
+}
+
+.number_font1 {
+    font-size: 14px;
+    color: #736d6d;
+    margin-top: 10px;
+}
+
+.blue_text {
+    color: #51C7D6;
+}
+.success_background {
+    border: 1px solid #16AF81;
+    padding: 5px 5px;
+    background-color: #16AF81;
+    color: white;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.pending_background {
+    border: 1px solid #337ab7;
+    padding: 5px 5px;
+    background-color:  #337ab7;
+    color: white;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.cancelled_background {
+    background-color: #fd7570;
+    border: 1px solid #fd7570;
+    padding: 5px 5px;
+    color: white;
+    border-radius: 5px;
+    font-size: 13px;
+}
+.onhold_background {
+    background-color: #FEA115;
+    border: 1px solid #FEA115;
+    padding: 5px 5px;
+    color: white;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.search_icon {
+    font-size: 16px;
+    border: 1px solid #c5c5c5;
+    padding: 4px 8px;
+    background-color:#c5c5c5;
+    color: #fff;
+    border-radius: 5px;
+}
+.tb_img {
+    height: 35px;
+}
+.change_text {
+    border: 1px solid #8bc34a;
+    padding: 5px 5px;
+    background-color: #8bc34a;
+    color: white;
+    border-radius: 5px;
+    font-size: 10px;
+}
+
+.down_red {
+    color: red;
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+.up_green {
+    color: green;
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+.hover_table {
+    background-color: #fff;
+    /*margin-bottom: 30px;*/
+}
+
+.tot_boxline3 {
+    padding: 7px 10px;
+    background-color: #fff;
+}
+
+.report_tot_boxline {
+    background-color: #fff;
+
+}
+
+.product_stats {
+    margin-top: 30px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+.arrow_up img{
+  vertical-align:top;
+
+}
+.arrow_down{
+    vertical-align:middle;
+}
+
+.product_stats1 {
+    padding: 20px 10px;
+}
+
+.recent_mt-10 {
+    margin-top: 30px;
+    background-color: #fff;
+}
+.line_remove{
+   border:0px solid !important;
+}
+.recent_text {
+    padding: 10px 10px;
+}
+.progree_height{
+   height: 4px !important;
+}
+/*========chart============*/
+
+#annual-sales {
+    position: relative;
+    height: 260px;
+}
+
+#annual-sales .ct-grid {
+    stroke: rgba(0, 0, 0, .07);
+    stroke-width: 1px;
+    stroke-dasharray: 0;
+}
+
+#annual-sales .ct-label {
+    color: rgba(0, 0, 0, .7);
+    font-size: 1.1rem;
+}
+
+#annual-sales .ct-label.ct-horizontal.ct-end {
+    margin-left: -15px;
+}
+
+@media screen and (max-width:390px) {
+    #annual-sales {
+        height: 200px;
+    }
+    #annual-sales .ct-label.ct-horizontal.ct-end {
+        transform: rotate(-45deg);
+    }
+}
+
+#annual-sales .ct-series-a .ct-line,
+#annual-sales .ct-series-a .ct-point {
+    stroke: #4FC1E9;
+}
+
+#annual-sales .ct-series-b .ct-line,
+#annual-sales .ct-series-b .ct-point {
+    stroke: #09BD8F;
+}
+
+#annual-sales .ct-point {
+    stroke-width: 7px;
+    cursor: pointer;
+}
+
+#annual-sales .ct-series-a .ct-area {
+    fill: #BFBFC6;
+    fill-opacity: .05
+}
+
+#annual-sales .ct-series-b .ct-area {
+    fill: #4086C1;
+    fill-opacity: .05
+}
+
+#annual-sales .ct-line {
+    stroke-width: 1px
+}
+
+
+.nav-tabs:focus {
+    outline: none;
+}
+.card_border .card{
+   border:1px solid #ccc !important;
+}
+/*======chartist=========*/
+.Sales_text{
+    color:gray;
+}
+    .name_visitors{ color: #636c72;}
+
+@media(max-width:320px){
+    .pie_rate{
+        left: 37%;
+    }
+}
+@media(max-width:425px){
+    .pie_rate{
+        left: 40% !important;
+    }
+}
+@media (max-width:1024px){
+    .pie_rate{
+        left:36%;
+    }
+    .view{
+        line-height:144px;
+    }
+}

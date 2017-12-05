@@ -1,0 +1,20 @@
+@import "customvariables";
+.header {
+    z-index: 1030;
+    nav {
+        margin-bottom: 0;
+        height: 50px;
+        background-color: $header_color;
+    }
+    @media (min-width:768px) {
+        .logo {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        nav .sidebar-toggle {
+            position: relative;
+            left: $left_menu_width;
+        }
+    }
+}

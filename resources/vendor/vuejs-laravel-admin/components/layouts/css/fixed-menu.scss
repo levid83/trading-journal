@@ -1,0 +1,23 @@
+@import "customvariables";
+aside.left-aside {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    max-height: 100%;
+    height: calc(100% - 50px);
+    overflow-y: auto;
+    @media screen and (max-width: 560px) {
+        top: 100px;
+        height: calc(100% - 100px);
+    }
+}
+
+aside.right-aside {
+    display: block !important;
+    width: auto !important;
+    margin-left: $left_menu_width;  //for compact-menu left-menu width use $left_compact_width
+}
+
+body.left-hidden aside.right-aside {
+    margin-left: 0;
+}

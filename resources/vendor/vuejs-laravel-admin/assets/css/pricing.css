@@ -1,0 +1,145 @@
+.plan-desc {
+    color : #777;
+}
+.basic, .standard, .premium {
+    border         : 1px solid #E5E5E5;
+    border-radius  : 3px;
+    margin-top     : 20px;
+    margin-bottom  : 10px;
+    padding-bottom : 25px;
+}
+.standard {
+    box-shadow : 0 6px 30px #CCC;
+}
+.modal-1{
+    background-color: #fff;
+}
+.modal-2{
+    background-color: #fff;
+}
+.modal-1 .pack-heading {
+    background-color : #E5E5E5;
+    margin-bottom    : 10px;
+    padding          : 9px 0;
+    height           : 76px;
+}
+.modal-1 .pack-title {
+    font-size : 22px;
+}
+.modal-1 .pack-price {
+    position      : absolute;
+    width         : 55px;
+    height        : 55px;
+    left          : 0;
+    right         : 0;
+    margin-top    : -3px;
+    margin-left   : auto;
+    margin-right  : auto;
+    border-radius : 50px;
+    font-size     : 18px;
+    padding-top   : 15px;
+}
+.modal-1 .pack-details {
+    padding : 45px 15px 10px;
+}
+.modal-1 .pack-details li {
+    margin-bottom : 15px;
+    line-height   : 40px;
+    color         : #777;
+    font-size     : 13px;
+}
+.modal-1 .btn-getit {
+    -webkit-border-radius : 20px;
+    -moz-border-radius    : 20px;
+    border-radius         : 20px;
+    padding               : 5px 17px;
+}
+.modal-1 .trending-tag {
+    height   : 68px;
+    overflow : hidden;
+    position : absolute;
+    right    : 12px;
+    top      : 17px;
+    width    : 85px;
+}
+.tag-design {
+    font              : bold 12px Open Sans;
+    padding           : 3px 0;
+    position          : relative;
+    text-align        : center;
+    top               : 15px;
+    -webkit-transform : rotate(40deg);
+    -moz-transform    : rotate(40deg);
+    -ms-transform     : rotate(40deg);
+    -o-transform      : rotate(40deg);
+    transform         : rotate(40deg);
+    width             : 110px;
+    box-shadow        : 9px 0 10px #777;
+}
+/*tarrif modal 2*/
+.modal-2 {
+    margin-top    : 25px;
+    margin-bottom : 20px;
+    padding       : 20px;
+}
+.shared.modal-2 {
+    border : 1px solid #6699CC;
+}
+.vps.modal-2 {
+    border : 1px solid #FF6666;
+}
+.dedicated.modal-2 {
+    border : 1px solid #66CCFF;
+}
+.modal-2 .pack-price {
+    position      : absolute;
+    width         : 65px;
+    height        : 65px;
+    top           : 7px;
+    right         : 0;
+    border-radius : 50px;
+    font-size     : 18px;
+    padding-top   : 11px;
+    border        : 9px solid #FFF;
+}
+.bg-danger, .bg-info {
+    color : #FFF;
+}
+.modal-2 .pack-title {
+    margin-top : 0;
+    font-size  : 22px;
+}
+.modal-2 .pack-desc {
+    font-size : 14px;
+    color     : #666;
+}
+.modal-2 .pack-body {
+    margin-right : -20px;
+    position     : relative;
+    overflow     : hidden;
+}
+.modal-2 .pack-details {
+    margin-bottom : 20px;
+}
+.modal-2 .pack-details li {
+    line-height : 40px;
+    color       : #777;
+    font-size   : 13px;
+}
+.modal-2 .pack-details li i {
+    margin-right : 5px;
+}
+.modal-2 .tarrif_icon {
+    position  : absolute;
+    right     : -44px;
+    font-size : 130px;
+    bottom    : -22px;
+    color     : #EEE;
+}
+
+@media screen and (max-width : 767px) {
+    .trending-tag {
+        right : 15px;
+        top   : 0;
+    }
+}

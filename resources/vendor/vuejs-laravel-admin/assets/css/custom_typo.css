@@ -1,0 +1,50 @@
+
+.typo-heading h1,
+.typo-heading h2,
+.typo-heading h3,
+.typo-heading h4,
+.typo-heading h5,
+.typo-heading h6{
+    color : #777;
+}
+.p-l-25 {
+    padding-left : 25px;
+}
+.styled-ul {
+ list-style: disc;
+}
+.styled-ul li ul {
+    list-style-type: circle;
+}
+
+.list-lineheight li {
+    line-height: 20px;
+}
+mark {
+    background-color: #FFCE56;
+}
+blockquote {
+    font-size: 14px;
+    background-color: rgba(34, 131, 191, .1);
+    border-left: 5px solid rgba(34, 131, 191, .7);
+}
+.blockquote-reverse, blockquote.pull-right {
+    border-right  : 5px solid rgba(34, 131, 191, .7);
+}
+blockquote footer {
+    color: #999;
+}
+@media (min-width: 768px){
+    .dl-horizontal dd {
+        margin-left: 180px;
+    }
+    .dl-horizontal dt  {
+    float: left;
+    width: 160px;
+    clear: left;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    }
+}

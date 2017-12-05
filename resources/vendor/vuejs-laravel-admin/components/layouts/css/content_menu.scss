@@ -1,0 +1,13 @@
+.left-aside{
+    border-top:2px solid #eee;
+     border-left:2px solid #eee;
+}
+@media screen and(min-width:992px) {
+    .wrapper {
+        padding: 25px 25px 0 25px;
+        & > .right-aside {
+            width: 95% !important;
+            min-width: 95% !important;
+        }
+    }
+}
