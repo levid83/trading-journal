@@ -87,7 +87,7 @@ class IBFlexQueryResultMap implements TradeImportMap
 		if (in_array($row['assetclass'], ['FOP'])) {
 			return str_before($row['description'], " ");
 		}else {
-			return $row['underlyingsymbol'];
+			return (string)$row['underlyingsymbol'];
 		}
 	}
 	
