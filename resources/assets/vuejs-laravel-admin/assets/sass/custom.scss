@@ -1,0 +1,485 @@
+/*
+Created by: Jyostna Designs
+
+[TABLE OF CONTENTS]
+
+1.  RESET STYLES
+2.  HEADER STYLES
+    2.1 HEADER LEFT
+    2.2 HEADER RIGHT SIDE DROPDOWNS
+3. LEFT SIDEBAR
+4. MAIN WRAPPER STYLES
+5. LEFT MENU COLLAPSE STYLES
+6. CUSTOM STYLES
+7. MEDIA QUERIES
+
+*/
+
+
+/*===import bootstrap variables===*/
+@import "../../../../../node_modules/bootstrap/scss/_functions";
+@import "bootstrap/_variables";
+@import "../../components/layouts/css/_customvariables";
+
+/*****  1.RESET STYLES  *****/
+
+html {
+    background: none repeat scroll 0 0 #fff;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -webkit-transition: all .25s ease-out;
+    -moz-transition: all .25s ease-out;
+    transition: all .25s ease-out;
+    font-size: small;
+}
+html,button, input, optgroup, select, textarea{
+        font-family: $font-family-base;
+
+}
+body {
+    background: none repeat scroll 0 0 #fff;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -webkit-transition: all .25s ease-out;
+    -moz-transition: all .25s ease-out;
+    transition: all .25s ease-out;
+    font-size: small;
+    letter-spacing: 0.5px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+body,
+#app,
+#app>div,
+#app div.wrapper {
+    min-height: 100vh;
+}
+
+ul {
+    list-style: none;
+}
+
+label {
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+a:hover,
+a {
+    text-decoration: none !important;
+}
+
+.table > thead > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > th,
+.table > tbody > tr > td,
+.table > tfoot > tr > th,
+.table > tfoot > tr > td {
+    vertical-align: middle;
+}
+
+
+/**Dropdown menus**/
+
+.dropdown-menu {
+    -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    z-index: 2300;
+    margin-top: 0;
+    border: none;
+    outline: none;
+}
+
+/*********6. CUSTOM STYLES *********/
+.submenu-content .name{
+    vertical-align: text-top !important;
+}
+
+/*text-area resize*/
+
+.resize_vertical {
+    resize: vertical;
+}
+
+h4.card-header {
+    font-size: 16px;
+}
+
+.card {
+    margin-bottom: 25px;
+}
+
+
+/**************card bg colors*******************/
+
+.bg-primary-card {
+    border: 1px solid $primary;
+    >.card-header {
+        background-color: $primary;
+        color: #fff;
+    }
+}
+
+.bg-info-card {
+    border: 1px solid $info;
+    >.card-header {
+        background-color: $info;
+        color: #fff;
+    }
+}
+
+.bg-warning-card {
+    border: 1px solid $warning;
+    >.card-header {
+        background-color: $warning;
+        color: #fff;
+    }
+}
+
+.bg-danger-card {
+    border: 1px solid $danger;
+    >.card-header {
+        background-color: $danger;
+        color: #fff;
+    }
+}
+
+.bg-success-card {
+    border: 1px solid $success;
+    >.card-header {
+        background-color: $success;
+        color: #fff;
+    }
+}
+
+.bg-primary-card:hover,
+.bg-info-card:hover,
+.bg-danger-card:hover,
+.bg-warning-card:hover,
+.bg-success-card:hover,
+.card:hover {
+    box-shadow: 1px 1px 38px -8px #8e8c8e;
+}
+
+.btn-link,
+.btn {
+    cursor: pointer;
+}
+
+
+/*=======hide unwanted content in print======*/
+
+@media print {
+    header.header,
+    aside.left-aside,
+    section.content-header,
+    #scroll {
+        display: none !important;
+    }
+    .table-responsive {
+        display: inline-table;
+        width: 100%;
+    }
+}
+
+
+/*=======hide unwanted content in print======*/
+
+
+/*============header styles=======*/
+
+header .navbar-right {
+    .dropdown-menu {
+        padding: 0;
+    }
+    .dropdownheader .nav.nav-tabs,
+    .dropdown-footer,
+    .dropdownheader:hover .nav.nav-tabs,
+    .dropdown-footer:hover {
+        background: $header_color;
+        color:$footer_color;
+        border:1px solid #ccc;
+    }
+    .show > .btn-secondary.dropdown-toggle {
+        background-color: $dropdown_background_color;
+        color: #000;
+        border-color:$dropdown_background_color;
+    }
+    .btn-link:focus,
+    .btn-link:hover,
+    .btn-link:active {
+        text-decoration: none;
+    }
+    .btn .btn:active {
+        border: none;
+    }
+    .btn-group {
+        >button {
+            vertical-align: top;
+            color: $right_side_user;
+            &:hover {
+                background-color:#ededed;
+                color: #000;
+            }
+        }
+    }
+}
+@media (max-width: 560px) {
+    .notifications-menu .dropdown-menu.dropdown-menu-right {
+        right: -123px;
+    }
+}
+
+.notifications-menu .dropdown-menu {
+    width: 300px;
+}
+
+.dropdownheader .nav-tabs .nav-link {
+    color:$nav_tab_color;
+}
+
+.dropdown-menu .nav-tabs .nav-link:focus,
+.dropdown-menu .nav-tabs .nav-link:hover {
+    border-color: transparent;
+}
+
+.dropdown-menu .nav-tabs .nav-link.active,
+.dropdown-menu .nav-tabs .nav-item.show .nav-link {
+    color: #000;
+    //border-bottom: 3px solid $dropdown_tab_active;
+    background-color: #eee;
+    border-left: 1px transparent;
+    border-right: 1px transparent;
+    border-top: 1px transparent;
+}
+
+.nav-tabs>li>a{
+    color:$nav_tabs_color;
+}
+.drpodowtext {
+    color: #333;
+    transition: 300ms;
+}
+
+.drpodowtext:hover {
+    margin-left: 12px;
+    transition: 300ms;
+}
+
+.dropdown_content a {
+    width: 100%;
+    display: block;
+    padding: 10px 15px;
+}
+
+.dropdown-item img {
+    height: 50px;
+    width: 50px;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    color: #111;
+    text-decoration: none;
+    background-color: transparent;
+}
+
+.btn-secondary:focus,
+.btn-secondary.focus {
+    box-shadow: none;
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+.fullscreen i {
+    font-size: 16px;
+    cursor: pointer;
+}
+.tab_color .card-header{
+    background-color: #fff;
+}
+
+
+/*============header styles=======*/
+
+
+/*====================form editors Start============*/
+
+.ql-container .ql-editor {
+    min-height: 20em;
+    padding-bottom: 1em;
+    max-height: 25em;
+}
+.nav-tabs:focus {
+    outline: none ;
+}
+
+/*====================form editors end============*/
+
+
+/*=========calendar========*/
+
+.full-calendar-body .dates .dates-events .events-week .events-day {
+    min-height: 100px !important;
+}
+
+.full-calendar-header>div.header-center {
+    font-size: 18px;
+}
+
+
+/*=========calendar========*/
+
+
+/*======chartist=====*/
+
+.ct-series-a .ct-line,
+.ct-series-a .ct-point {
+    stroke: #8dcee4 !important;
+}
+
+.ct-series-b .ct-line,
+.ct-series-b .ct-point {
+    stroke: #4fc1e9 !important;
+}
+
+.ct-series-c .ct-line,
+.ct-series-c .ct-point {
+    stroke: #16AF81 !important;
+}
+
+.ct-series-d .ct-line,
+.ct-series-d .ct-point {
+    stroke: #8dcee4 !important;
+}
+
+/*======chartist bars=====*/
+.ct-series-a .ct-bar {
+    /* Colour of your bars */
+    stroke: #97d9ef !important;
+}
+
+.ct-series-b .ct-bar {
+    /* Colour of your bars */
+    stroke: #4fc1e9 !important;
+}
+
+.ct-label {
+    font-size: 10px;
+    color: #000;
+}
+
+
+/*======pie chart=====*/
+
+    .ct-series-a .ct-slice-pie {
+  fill: #7faff7 !important;
+  
+}
+   .ct-series-b .ct-slice-pie {
+  fill: #6f8dd5 !important;
+ 
+}
+   .ct-series-c .ct-slice-pie {
+  fill: #11bca9 !important;
+ 
+}
+.v-chartist-container {
+    height: 300px;
+}
+
+/*====== donut chart=====*/
+.ct-series-a .ct-slice-donut {
+  
+  stroke:  #11bca9 !important;
+  
+}
+.ct-series-a .ct-slice-donut {
+  
+  stroke: #6f8dd5 !important;
+  
+}
+.ct-series-a .ct-slice-donut {
+  
+  stroke: #7faff7 !important;
+  
+}
+.ct-series-c .ct-slice-donut{
+    stroke:#11bca9 !important;
+}
+.ct-series-b .ct-slice-donut{
+    stroke:#6f8dd5 !important;
+}
+/*=======form-elements======*/
+
+.drp_align .dropdown-menu {
+    left: -100%;
+}
+
+.form_elemntsdropdown .dropdown-item {
+    padding: 10px 15px;
+}
+
+
+/*=======form-elements======*/
+
+
+/*========breadcrumbs====*/
+
+.breadcrumb1 >.breadcrumb-item + .breadcrumb-item::before {
+    content: "\00BB";
+}
+
+.breadcrumb2 >.breadcrumb-item + .breadcrumb-item::before {
+    content: "\203A" !important;
+}
+
+.breadcrumb3 >.breadcrumb-item + .breadcrumb-item::before {
+    content: "\2013 ";
+}
+
+
+/*========breadcrumbs====*/
+
+
+/*==========datepickers=========*/
+
+.vdp-datepicker input,
+.vdp-datepicker select {
+    padding: .75em .5em;
+    font-size: 100%;
+    border: 1px solid #dcdccc;
+    width: 100%
+}
+
+@media (max-width: 768px) {
+    .vdp-datepicker__calendar {
+        width: 100% !important;
+    }
+}
+
+/*==========datepickers=========*/
+// themify dark-circle
+//.ti-dark-circle:before{
+//content:"\2022";
+//color:#888585;
+//}
+//.menu-item.active .ti-dark-circle:before{
+//    color: #fff;
+//}
+// ======= bs3 classes==
+.pull-right{
+    float: right;
+}
+.car-header:first-child{
+    border:none !important;
+}
+.badge {
+
+    color:$white;
+}
