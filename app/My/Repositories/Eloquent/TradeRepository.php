@@ -78,7 +78,7 @@
 		}
 		
 		public function assets($filters=null){
-			return Asset::all()->get();
+			return Asset::all();
 		}
 		
 	}
