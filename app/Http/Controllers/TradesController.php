@@ -169,7 +169,8 @@ class TradesController extends Controller
 				->with('trade_actions', $this->tradeRepo->actions())
 				->with('option_types', $this->tradeRepo->optionTypes())
 				->with('tactics', $this->tradeRepo->tactics())
-				->with('positions', $this->tradeRepo->positions($filters));
+				->with('positions', $this->tradeRepo->positions($filters))
+				->with('vue_js',true);
 		}
     }
 

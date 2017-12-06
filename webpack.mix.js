@@ -26,7 +26,8 @@ mix.webpackConfig({
 	 publicPath: "/"
   }
 });
-mix.js('resources/vendor/vuejs-laravel-admin/main.js', 'public/vendor/vuejs-laravel-admin/js/main.js');
+//mix.js('resources/vendor/vuejs-laravel-admin/main.js', 'public/vendor/vuejs-laravel-admin/js/main.js');
+mix.js('resources/assets/admin/main.js', 'public/js/admin/main.js');
 /*
 mix.js('resources/assets/vuejs-admin/main.js', 'public/vuejs-admin/js')
    .sass('resources/assets/sass/app.scss', 'public/css')
