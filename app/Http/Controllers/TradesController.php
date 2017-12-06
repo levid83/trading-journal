@@ -11,8 +11,8 @@ use App\My\Models\Position;
 use App\My\Models\Trade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Session;
-use TCG\Voyager\Facades\Voyager;
 
 class TradesController extends Controller
 {
@@ -144,7 +144,7 @@ class TradesController extends Controller
      */
     public function index(TradeFilters $filters, Request $request)
     {
-    	if(Voyager::can('edit_trades')){
+    	if(Gate::allows('edit_trades')){
     		$this->editTrades($request);
 		}else{
     		Session::flash("error","You have no permission to update these trades");

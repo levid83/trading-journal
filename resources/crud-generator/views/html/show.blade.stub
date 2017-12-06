@@ -1,4 +1,4 @@
-@extends('voyager::master')
+@extends('layouts.index')
 
 @section('content')
 <div class="page-content read container-fluid">
