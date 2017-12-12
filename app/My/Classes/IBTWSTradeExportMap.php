@@ -164,9 +164,11 @@ class IBTWSTradeExportMap implements TradeImportMap
 	}
 	
 	/**
-	 * @param array $params
+	 * @param array $data
+	 *
+	 * @return array
 	 */
-    public function map($data){
+    public function map(array $data) : array {
     	$map=array();
          if (!empty($data)){
             foreach ($data as $row) {

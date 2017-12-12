@@ -3,12 +3,14 @@
 namespace App;
 
 use App\My\Models\TradingAccount;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class User extends \Illuminate\Foundation\Auth\User
 {
-    use Notifiable;
+    use  Notifiable, HasRoles;
     
     const SUPERUSER_ROLE_ID=1;
 

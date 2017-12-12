@@ -105,36 +105,38 @@ class TradesController extends Controller
 		}
 	}
 	private function editTrades(Request $request){
-		if (!empty($request->trade)) {
+		
+		if(Gate::allows('edit_trades')) {
 			if ($request->has('add_tactic') && isset($request->tactic_id)) {
 				$this->updateTactics($request->tactic_id, $request->trade);
 				
-				Session::flash('success','Tactic successfully updated.');
+				Session::flash('success', 'Tactic successfully updated.');
 			}
 			if ($request->has('remove_tactic')) {
 				$this->removeTactics($request->trade);
 				
-				Session::flash('success','Tactic successfully removed.');
+				Session::flash('success', 'Tactic successfully removed.');
 			}
 			
 			if ($request->has('add_new_position')) {
 				$this->createNewPosition($request->trade);
 				
-				Session::flash('success','New position successfully created.');
+				Session::flash('success', 'New position successfully created.');
 			}
 			
 			if ($request->has('add_to_position') && isset($request->position_id)) {
 				$this->updatePositions($request->position_id, $request->trade);
 				
-				Session::flash('success','Position successfully updated.');
+				Session::flash('success', 'Position successfully updated.');
 			}
 			
 			if ($request->has('remove_position')) {
 				$this->removePositions($request->trade);
-				Session::flash('success','Position successfully removed.');
+				Session::flash('success', 'Position successfully removed.');
 			}
+		}else{
+			Session::flash("error","You have no permission to update these trades");
 		}
-		
 	}
 	
     /**
@@ -144,12 +146,9 @@ class TradesController extends Controller
      */
     public function index(TradeFilters $filters, Request $request)
     {
-    	if(Gate::allows('edit_trades')){
-    		$this->editTrades($request);
-		}else{
-    		Session::flash("error","You have no permission to update these trades");
+		if (!empty($request->trade)) {
+			$this->editTrades($request);
 		}
-		
 		$trades=$this->tradeRepo->search($filters)
 								->sortable()
 								->simplePaginate(30);
@@ -157,9 +156,20 @@ class TradesController extends Controller
 		$request->flashExcept(['trade']);
 		
 		if($request->ajax()){
-			return response()->json($trades);
+			return response()->json(
+				[
+					'trades'=>	$trades,
+					'traders'=>	$this->tradeRepo->traders(),
+					'clients'=>	$this->tradeRepo->clients(),
+					'trade_types' => $this->tradeRepo->tradeTypes(),
+					'asset_classes' => $this->tradeRepo->assetClasses(),
+					'trade_actions' => $this->tradeRepo->actions(),
+					'option_types' => $this->tradeRepo->optionTypes(),
+					'tactics' => $this->tradeRepo->tactics(),
+					'positions' => $this->tradeRepo->positions($filters),
+				]
+			);
 		}else {
-			
 			return view('admin.trades.index')
 				->with('trades', $trades)
 				->with('traders', $this->tradeRepo->traders())
@@ -170,7 +180,7 @@ class TradesController extends Controller
 				->with('option_types', $this->tradeRepo->optionTypes())
 				->with('tactics', $this->tradeRepo->tactics())
 				->with('positions', $this->tradeRepo->positions($filters))
-				->with('vue_js',true);
+				->with('vue_js',false);
 		}
     }
 

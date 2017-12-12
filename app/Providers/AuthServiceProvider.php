@@ -2,11 +2,12 @@
 
 namespace App\Providers;
 
+use App\Permission;
 use App\My\Models\Trade;
 use App\My\Models\TradeLog;
 use App\Policies\TradeLogPolicy;
 use App\Policies\TradePolicy;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -27,10 +28,25 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Gate $gate)
     {
-        $this->registerPolicies();
-        
-		//
+        $this->registerPolicies($gate);
+	
+		// Dynamically register permissions with Laravel's Gate.
+		foreach ($this->getPermissions() as $permission) {
+			$gate->define($permission->name, function ($user) use ($permission) {
+				return $user->hasPermission($permission);
+			});
+		}
     }
+	
+	/**
+	 * Fetch the collection of site permissions.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Collection
+	 */
+	protected function getPermissions()
+	{
+		return Permission::with('roles')->get();
+	}
 }

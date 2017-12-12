@@ -171,7 +171,6 @@ return [
         Laravel\Tinker\TinkerServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 		
-		
 		Kyslik\ColumnSortable\ColumnSortableServiceProvider::class,
 
         /*

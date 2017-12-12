@@ -1,8 +1,5 @@
-@if($vue_js == true)
-    @extends('admin.layouts.vuejs-admin')
-@else
+@extends('admin.layouts.index')
 
-@endif
 
 @section('content')
     @include('admin.includes.styles')
@@ -21,7 +18,7 @@
             <div id="trades_filterbar" class="panel-collapse collapse in">
                 <div class="panel-body">@include ('admin.trades.filterbar')</div>
             </div>
-        </div>
+        </div>+
         <div class="panel panel-default" id="trades_lsit_panel">
             <div class="panel-heading">
                 <h5 class="panel-title">
@@ -39,9 +36,7 @@
                                 <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page','trade')))->render() !!} </div>
                             </div>
 
-                        @if($vue_js == true)
-                            <trades-page></trades-page>
-                        @else
+
                           <table class="table-bordered table-striped table-condensed small" id="responsive-grid">
                             <thead>
                             <tr>
@@ -110,7 +105,7 @@
                             @endforeach
                             </tbody>
                         </table>
-                        @endif
+
                         <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page','trade')))->render() !!} </div>
                     </div>
 
