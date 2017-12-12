@@ -1,5 +1,6 @@
 <template>
-    <table class="table-bordered table-striped table-condensed small fully-responsive-table" id="fully-responsive-table">
+    <table class="table-bordered table-striped table-condensed small fully-responsive-table"
+           id="fully-responsive-table">
         <thead>
         <tr>
             <th></th>
@@ -27,9 +28,9 @@
         </tr>
         </thead>
         <tbody>
-    <template v-for="trade in trades" >
-        <trade-item :trade="trade"></trade-item>
-    </template>
+        <template v-for="trade in trades">
+            <trade-item :trade="trade"></trade-item>
+        </template>
         </tbody>
     </table>
 </template>
@@ -39,16 +40,15 @@
   export default {
     name: 'trade-list',
     data () {
-      return {
-      }
+      return {}
     },
     created () {
-        this.$store.dispatch('allTrades');
-     },
+      this.$store.trades.dispatch('allTrades');
+    },
 
-    computed: {
+    computed  : {
       trades () {
-        return this.$store.getters.allTrades
+        return this.$store.trades.getters.allTrades
       }
     },
     components: {
@@ -58,7 +58,7 @@
 </script>
 
 <style scoped>
-    .fully-responsive-table{
-        width:100%;
+    .fully-responsive-table {
+        width: 100%;
     }
 </style>

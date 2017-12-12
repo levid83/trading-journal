@@ -11,8 +11,12 @@
         <td data-title="Trader">{{ trader_name }}</td>
         <td data-title="Client">{{ client_name }}</td>
         <td data-title="Asset">{{ trade.underlying }}</td>
-        <td data-title="Position" title=""><trade-position-selectbox  :position_id="position_id" :trade_id="trade_id" ></trade-position-selectbox></td>
-        <td data-title="Tactic"><trade-tactic-selectbox  :tactic_id="tactic_id" :trade_id="trade_id" ></trade-tactic-selectbox></td>
+        <td data-title="Position" title="">
+            <trade-position-selectbox :position_id="position_id" :trade_id="trade_id"></trade-position-selectbox>
+        </td>
+        <td data-title="Tactic">
+            <trade-tactic-selectbox :tactic_id="tactic_id" :trade_id="trade_id"></trade-tactic-selectbox>
+        </td>
         <td data-title="Class">{{ trade.asset_class }}</td>
         <td data-title="Action">{{ trade.action }}</td>
         <td data-title="Qty.">{{ trade.quantity }}</td>
@@ -28,7 +32,10 @@
         <td data-title="Closed">{{ trade.close_date }}</td>
         <td data-title="Status">{{ trade.status }}</td>
         <td>
-            <a href="#" title="Edit trade"><button class="btn btn-primary btn-sm"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>
+            <a href="#" title="Edit trade">
+                <button class="btn btn-primary btn-sm"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+                </button>
+            </a>
         </td>
     </tr>
 </template>
@@ -40,24 +47,25 @@
   export default {
     components: {
       'trade-position-selectbox': TradePositionSelectbox,
-      'trade-tactic-selectbox': TradeTacticSelectbox},
-    name: 'trade-item',
-    data (){
-        return {
-          selectedTrade: false,
-        }
+      'trade-tactic-selectbox'  : TradeTacticSelectbox
     },
-    props: ['trade'],
-    watch: {
+    name      : 'trade-item',
+    data (){
+      return {
+        selectedTrade: false,
+      }
+    },
+    props     : ['trade'],
+    watch     : {
       selectedTrade (value) {
         if (value) {
-          this.$store.dispatch('selectTrade', this.trade['id'])
+          this.$store.trades.dispatch('selectTrade', this.trade['id'])
         } else {
-          this.$store.dispatch('deselectTrade', this.trade['id'])
+          this.$store.trades.dispatch('deselectTrade', this.trade['id'])
         }
       }
     },
-    computed: {
+    computed  : {
       trader_name: function ()
       {
         if (this.trade.trader_id.isNull) {

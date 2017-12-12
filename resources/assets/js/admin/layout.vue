@@ -13,36 +13,36 @@
 
 <style lang="scss" src="../vuejs-laravel-admin/assets/sass/custom.scss"></style>
 <script>
-    import preloader from "../vuejs-laravel-admin/components/layouts/preloader/preloader.vue";
+  import preloader from "../vuejs-laravel-admin/components/layouts/preloader/preloader.vue";
 
-	import right_side from "../vuejs-laravel-admin/components/layouts/right-side.vue";
-	// import left-side from default or horizontal-menu or compact-menu
-	import left_side from "../vuejs-laravel-admin/components/layouts/left-side/default/left-side.vue";
+  import right_side from "../vuejs-laravel-admin/components/layouts/right-side.vue";
+  // import left-side from default or horizontal-menu or compact-menu
+  import left_side from "../vuejs-laravel-admin/components/layouts/left-side/default/left-side.vue";
 
-	// import from header.vue or fixed-header.vue or no-header.vue
-	import vueadmin_header from "../vuejs-laravel-admin/components/layouts/header/fixed-header.vue"
+  // import from header.vue or fixed-header.vue or no-header.vue
+  import vueadmin_header from "../vuejs-laravel-admin/components/layouts/header/fixed-header.vue"
 
-	import anime from 'animejs';
-	export default {
-		name: 'layout',
-		components: {
-			preloader,
-			vueadmin_header,
-			left_side,
-			right_side
-		},
-		data() {
-			return {
-				showtopbtn: false
-			}
-		},
-		mounted() {
-			if (window.innerWidth <= 992) {
-				this.$store.commit('left_menu', "close");
-			}
-		},
+  import anime from 'animejs';
+  export default {
+    name      : 'layout',
+    components: {
+      preloader,
+      vueadmin_header,
+      left_side,
+      right_side
+    },
+    data() {
+      return {
+        showtopbtn: false
+      }
+    },
+    mounted() {
+      if (window.innerWidth <= 992) {
+        this.$store.commit('left_menu', "close");
+      }
+    },
 
-	}
+  }
 </script>
 <style lang="scss" scoped>
     .wrapper:before,
@@ -50,9 +50,11 @@
         display: table;
         content: " ";
     }
+
     .wrapper:after {
         clear: both;
     }
+
     .wrapper {
         display: table;
         overflow-x: hidden;
@@ -60,15 +62,18 @@
         max-width: 100%;
         table-layout: fixed
     }
+
     .right-aside,
     .left-aside {
         padding: 0;
         display: table-cell;
         vertical-align: top;
     }
-    .right-aside{
+
+    .right-aside {
         background-color: #ebf2f6 !important;
     }
+
     @media (max-width: 992px) {
         .wrapper > .right-aside {
             width: 100vw;

@@ -1,26 +1,30 @@
-
 export const tradeGetters = {
-  allTrades: (state) => {
+  allTrades: (state) =>
+  {
     return state.trades
   }
 }
 
 export const tacticGetters = {
 
-  allTactics: (state) => {
+  allTactics     : (state) =>
+  {
     return state.tactics
   },
-  isTacticLoading: (state) => {
+  isTacticLoading: (state) =>
+  {
     return state.tacticLoading
   }
 }
 
 export const positionGetters = {
-  
-  allPositions: (state) => {
+
+  allPositions     : (state) =>
+  {
     return state.positions
   },
-  isPositionLoading: (state) => {
+  isPositionLoading: (state) =>
+  {
     return state.positionLoading
   }
 }
