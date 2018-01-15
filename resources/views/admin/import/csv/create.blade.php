@@ -1,4 +1,10 @@
-@extends('admin.layouts.index')
+@extends('adminlte::page')
+
+@section('title', 'Trade Import')
+
+@section('content_header')
+
+@stop
 
 @section('content')
     @include('admin.includes.errors')
@@ -9,7 +15,7 @@
             </div>
 
             <div class="panel-body">
-                <form action="{{ route('csv.bulk-import.store') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('trade-import.store') }}" method="post" enctype="multipart/form-data">
                     {{ csrf_field() }}
                     <div class="form-group">
                         <label for="trade_file">Trade csv file</label>
@@ -27,4 +33,11 @@
             </div>
         </div>
     </div>
+@stop
+@section('css')
+
+@stop
+
+@section('js')
+
 @stop

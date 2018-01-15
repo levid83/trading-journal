@@ -1,3 +1,6 @@
+<form method="get" action="" accept-charset="UTF-8">
+    {{ csrf_field() }}
+    {{ method_field('GET') }}
 <div class="col-sm-12 col-md-2 col-lg-2">
     <div class="form-group">
         <label for="filterStatus" class="control-label">{{ 'Status' }}</label>
@@ -135,3 +138,4 @@
         <button class="btn btn-info btn-sm" type="submit">Search</button>
     </div>
 </div>
+</form>
