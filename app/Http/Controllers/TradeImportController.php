@@ -13,7 +13,7 @@ use Carbon\Carbon;
 use App\My\Classes\TradeImport;
 use App\My\Classes\IBTradeLogFile;
 
-class CsvController extends Controller
+class TradeImportController extends Controller
 {
 
 		
