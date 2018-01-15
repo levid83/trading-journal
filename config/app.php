@@ -172,7 +172,9 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
 		
 		Kyslik\ColumnSortable\ColumnSortableServiceProvider::class,
-
+	
+		JeroenNoten\LaravelAdminLte\ServiceProvider::class,
+        
         /*
          * Application Service Providers...
          */
