@@ -11,7 +11,9 @@ use App\My\Models\Position;
 use App\My\Models\Trade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Session;
 
 class TradesController extends Controller
@@ -34,7 +36,7 @@ class TradesController extends Controller
 	
 	private function updateTactics($tacticId, Array $trades){
 		if (!empty($trades) && $tacticId>0){
-			foreach ($trades as $id){
+			foreach ($trades as $id=>$item){
 				$trade = Trade::find($id);
 				if (Auth::user()->can('update',$trade)) {
 					$trade->tactic_id = $tacticId;
@@ -46,7 +48,7 @@ class TradesController extends Controller
 	
 	private function removeTactics(Array $trades){
 		if (!empty($trades)){
-			foreach ($trades as $id){
+			foreach ($trades as $id=>$item){
 				$trade=Trade::find($id);
 				if (Auth::user()->can('update',$trade)) {
 					$trade->tactic_id = null;
@@ -56,15 +58,20 @@ class TradesController extends Controller
 		}
 	}
 	
-	private function createNewPosition(Array $trades){
+	private function createPosition(){
+		//@todo set the position params
+		$position=new Position();
+		$position->counter=1;
+		$position->name='';
+		$position->save();
+		return $position;
+	}
+	
+	private function addNewPosition(Array $trades){
 		if (!empty($trades)){
-			//@todo set the position params
-			$position=new Position();
-			$position->counter=1;
-			$position->name='';
-			$position->save();
-
-			foreach ($trades as $id){
+			
+			$position=$this->createPosition();
+			foreach ($trades as $id=>$item){
 				$trade = Trade::find($id);
 				if (Auth::user()->can('update',$trade)) {
 					$trade->position_id = $position->id;
@@ -80,14 +87,13 @@ class TradesController extends Controller
 	private function updatePositions($positionId, Array $trades){
 		if (!empty($trades) && $positionId>0){
 			//@todo update the position params
-			foreach ($trades as $id){
+			foreach ($trades as $id=>$item){
 				$trade=Trade::find($id);
 				if (Auth::user()->can('update',$trade)) {
 					$trade->position_id = $positionId;
 					$trade->save();
 				}
 			}
-			
 			$position=Position::find($positionId);
 			$position->generateName();
 			$position->save();
@@ -95,7 +101,7 @@ class TradesController extends Controller
 	}
 	private function removePositions(Array $trades){
 		if (!empty($trades)){
-			foreach ($trades as $id){
+			foreach ($trades as $id=>$item){
 				$trade=Trade::find($id);
 				if (Auth::user()->can('update',$trade)) {
 					$trade->position_id = null;
@@ -104,9 +110,8 @@ class TradesController extends Controller
 			}
 		}
 	}
-	private function editTrades(Request $request){
-		
-		if(Gate::allows('edit_trades')) {
+	private function updateTrades(Request $request){
+		//if(Gate::allows('edit_trades')) {
 			if ($request->has('add_tactic') && isset($request->tactic_id)) {
 				$this->updateTactics($request->tactic_id, $request->trade);
 				
@@ -119,7 +124,7 @@ class TradesController extends Controller
 			}
 			
 			if ($request->has('add_new_position')) {
-				$this->createNewPosition($request->trade);
+				$this->addNewPosition($request->trade);
 				
 				Session::flash('success', 'New position successfully created.');
 			}
@@ -134,9 +139,9 @@ class TradesController extends Controller
 				$this->removePositions($request->trade);
 				Session::flash('success', 'Position successfully removed.');
 			}
-		}else{
-			Session::flash("error","You have no permission to update these trades");
-		}
+		//}else{
+		//	Session::flash("error","You have no permission to update these trades");
+		//}
 	}
 	
     /**
@@ -146,12 +151,10 @@ class TradesController extends Controller
      */
     public function index(TradeFilters $filters, Request $request)
     {
-		if (!empty($request->trade)) {
-			$this->editTrades($request);
-		}
+
 		$trades=$this->tradeRepo->search($filters)
 								->sortable()
-								->simplePaginate(30);
+								->paginate(30);
 			
 		$request->flashExcept(['trade']);
 		
@@ -249,18 +252,41 @@ class TradesController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function update($id, Request $request)
-    {
-        
-        $requestData = $request->all();
-        
-        $trade = Trade::findOrFail($id);
-        $trade->update($requestData);
+    public function update($id,Request $request )
+	{
+	
+		if (!empty($request->trade)) $this->updateTrades($request);
+		
+		if ($id > 0) {
+			$trade = Trade::findOrFail($id);
+			if ($request->has('position_id')) {
+				if ($request->position_id=='new') {
+					$trade->position_id = ($position=$this->createPosition())->id;
+				}else{
+					$trade->position_id = $request->position_id;
+				}
+			}
+			if ($request->has('tactic_id')){
+				$trade->tactic_id = $request->tactic_id;
+			}
 
-        Session::flash('flash_message', 'Trade updated!');
-
-        return redirect('admin/trades');
-    }
+			$trade->save();
+			
+			if (isset($position)){
+				$position->generateName();
+				$position->save();
+			}
+		
+			if ($request->ajax()) {
+				return response()->json(['success' => 1, 'message' => 'Trade successfully updated']);
+			} else {
+				Session::flash('flash_message', 'Trade updated!');
+			}
+		}
+		if (!$request->ajax()) {
+			return redirect()->back();
+		}
+	}
 
     /**
      * Remove the specified resource from storage.
