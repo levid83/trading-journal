@@ -4,7 +4,7 @@
             @change="isChanged=true"
             :class="{'bg-yellow' : isChanged }">
         <option value="">--Empty--</option>
-        <option v-for="option in positions" v-bind:value="option.id" v-bind:alt="option.name">
+        <option v-for="option in positions" :value="option.id" :alt="option.name">
             {{ option.id }}
         </option>
     </select>

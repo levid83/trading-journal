@@ -36,4 +36,14 @@ class Position extends Model
     {
         return $this->hasMany(Trade::class);
     }
+	
+	/**
+	 * Get all of the position's comments.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+	 */
+	public function comments()
+	{
+		return $this->morphMany(Comment::class, 'commentable');
+	}
 }

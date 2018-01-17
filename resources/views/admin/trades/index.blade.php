@@ -40,11 +40,11 @@
                                         <div class="col-sm-12 col-md-2 col-lg-2">
                                             <div class="pagination-wrapper"> {!! $trades->appends(Request::except(array('page','trade')))->render() !!} </div>
                                         </div>
-
                                     <trade-list trades="{{ json_encode($trades) }}"
                                                 positions="{{ json_encode($positions) }}"
                                                 tactics="{{ json_encode($tactics) }}"
                                                 inline-template>
+
                                       <table class="table-bordered table-striped table-condensed small" id="responsive-grid">
                                         <thead>
                                         <tr>
@@ -71,7 +71,7 @@
                                             <th class="text-nowrap">@sortablelink('open_date','Opened')</th>
                                             <th class="text-nowrap">@sortablelink('close_date','Closed')</th>
                                             <th class="text-nowrap">@sortablelink('status','Status')</th>
-
+                                            <th class="text-nowrap">Comments</th>
                                         </tr>
                                         </thead>
                                         <tbody>

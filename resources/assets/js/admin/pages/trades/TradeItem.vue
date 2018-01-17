@@ -60,7 +60,12 @@
         <td data-title="Opened">{{ item.open_date }}</td>
         <td data-title="Closed">{{ item.close_date }}</td>
         <td data-title="Status">{{ item.status }}</td>
-
+        <td data-title="Status">
+            <trade-comment
+                                  :target="'commentModal'"
+                                  :position="position_id"
+            >Comments</trade-comment>
+        </td>
     </tr>
 </template>
 
@@ -68,6 +73,7 @@
 <script>
   import TradeTacticSelectbox from './TradeTacticSelectbox.vue'
   import TradePositionSelectbox from './TradePositionSelectbox.vue'
+  import TradeComment from './TradeComment.vue'
   export default {
     name      : 'trade-item',
     data (){
@@ -81,7 +87,8 @@
     props     : ['trade','positions','tactics'],
     components: {
       'trade-position-selectbox': TradePositionSelectbox,
-      'trade-tactic-selectbox'  : TradeTacticSelectbox
+      'trade-tactic-selectbox'  : TradeTacticSelectbox,
+      'trade-comment'  : TradeComment
     },
     computed  : {
       trader_name(){

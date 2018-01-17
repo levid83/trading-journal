@@ -28,9 +28,13 @@ Route::group(['prefix' => 'admin', 'middleware'=>['auth']], function () {
     Route::post('/trade-import/store', 'TradeImportController@store')->name('trade-import.store');
 	
     Route::resource('trades','TradesController');
-	//Route::get('trades/{id}','TradesController@update');
-		
+			
 	//Route::get('/assets', 'AssetsController@index')->name('admin.assets.index');
 	Route::get('/tactics', 'TacticsController@index')->name('admin.tactics.index');
 	Route::get('/positions', 'PositionsController@index')->name('admin.positions.index');
+	
+	
+	
+	Route::resource('comments','CommentsController');
+	Route::get('/comments/position/{position_id}','CommentsController@position');
 });
