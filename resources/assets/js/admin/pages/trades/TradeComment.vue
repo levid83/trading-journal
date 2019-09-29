@@ -20,7 +20,7 @@
                                     <div class="row">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                             <div class="form-group">
-                                                <textarea name="body" id="body" class="form-control" required="required" placeholder="Add a new comment" v-model="comment"></textarea>
+                                                <textarea name="comment" id="comment" class="form-control" placeholder="Add a new comment" v-model="comment"></textarea>
                                             </div>
                                             <div class="form-group"><button @click.prevent="addComment">Save</button></div>
                                         </div>
@@ -37,7 +37,7 @@
             </div>
         </div>
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                v-if="position"
+                v-show="position"
                 :data-target="'#'+target+position"
                 @click="showModal"
         ><slot></slot></button>
