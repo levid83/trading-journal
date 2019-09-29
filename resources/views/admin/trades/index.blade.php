@@ -67,7 +67,7 @@
                                             <th class="text-nowrap">@sortablelink('bid','Bid')</th>
                                             <th>Open Comm.</th>
                                             <th>Close Comm.</th>
-                                            <th class="text-nowrap">@sortablelink('profit','P/L')</th>
+                                            <th class="text-nowrap" title="${{number_format($total,2,'.',',')}}">@sortablelink('profit','P/L')</th>
                                             <th class="text-nowrap">@sortablelink('open_date','Opened')</th>
                                             <th class="text-nowrap">@sortablelink('close_date','Closed')</th>
                                             <th class="text-nowrap">@sortablelink('status','Status')</th>

@@ -153,15 +153,18 @@ class TradesController extends Controller
     {
 
 		$trades=$this->tradeRepo->search($filters)
-								->sortable()
+								->sortable(['id' => 'desc'])
 								->paginate(30);
-			
+		
+		$total=$this->tradeRepo->search($filters)->sum('profit');
+		
 		$request->flashExcept(['trade']);
 		
 		if($request->ajax()){
 			return response()->json(
 				[
 					'trades'=>	$trades,
+					'total'=>$total,
 					'traders'=>	$this->tradeRepo->traders(),
 					'clients'=>	$this->tradeRepo->clients(),
 					'trade_types' => $this->tradeRepo->tradeTypes(),
@@ -175,6 +178,7 @@ class TradesController extends Controller
 		}else {
 			return view('admin.trades.index')
 				->with('trades', $trades)
+				->with('total',$total)
 				->with('traders', $this->tradeRepo->traders())
 				->with('clients', $this->tradeRepo->clients())
 				->with('trade_types', $this->tradeRepo->tradeTypes())
