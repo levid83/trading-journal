@@ -102,5 +102,5 @@
 @stop
 
 @section('js')
-    <script src="{{ asset('js/admin/main.js')}}"></script>
+    <script src="{{ asset('frontend/js/admin/main.js')}}"></script>
 @stop

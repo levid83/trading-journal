@@ -1,4 +1,4 @@
-let mix = require('laravel-mix');
+let mix = require("laravel-mix");
 
 /*
  |--------------------------------------------------------------------------
@@ -11,8 +11,12 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/assets/js/admin/main.js', 'public/js/admin/main.js')
-   .sass('resources/assets/sass/app.scss', 'public/css')
-    .copy('node_modules/font-awesome/fonts/', 'public/fonts')
-    .sass('node_modules/font-awesome/scss/font-awesome.scss', 'public/css')
-    .version();
+mix
+  .js("resources/assets/js/admin/main.js", "public/frontend/js/admin/main.js")
+  .sass("resources/assets/sass/app.scss", "public/frontend/css")
+  .copy("node_modules/font-awesome/fonts/", "public/frontend/fonts")
+  .sass(
+    "node_modules/font-awesome/scss/font-awesome.scss",
+    "public/frontend/css"
+  )
+  .version();
