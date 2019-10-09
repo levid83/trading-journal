@@ -1,9 +1,10 @@
 /node_modules
-/public
+/public/mix-manifest.json
 /storage/*.key
 /storage/debugbar
 /vendor
 /.idea
+/.vscode
 /.vagrant
 Homestead.json
 Homestead.yaml
