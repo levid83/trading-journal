@@ -20,3 +20,4 @@ _ide_helper_models.php
 .eslintrc.json
 *.env
 composer.lock
+package-lock.json
